@@ -1,0 +1,8 @@
+﻿services:
+  queryresolverbot:
+    image: queryresolverbot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ApiKey=api

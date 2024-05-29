@@ -1,0 +1,5 @@
+{
+  "ApiKey": "api",
+  "UserId": 123,
+  "ConnectionString": "Server=postgredb;port=5432;Database=persistentbot;User Id=postgres;Password=123456"
+}

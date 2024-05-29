@@ -1,0 +1,16 @@
+﻿services:
+  postgredb:
+    image: postgres:13.10
+    hostname: postgredb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+  botwithpersistenstore:
+    image: botwithpersistenstore
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ApiKey=key
+      - UserId=id
+      - ConnectionString=Server=postgredb;port=5432;Database=persistentbot;User Id=postgres;Password=123456

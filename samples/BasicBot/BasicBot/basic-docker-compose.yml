@@ -1,0 +1,8 @@
+﻿services:
+  basicbot:
+    image: basicbot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ApiKey=key
