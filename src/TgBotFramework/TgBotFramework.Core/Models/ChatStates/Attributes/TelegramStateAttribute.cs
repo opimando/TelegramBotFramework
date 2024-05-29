@@ -72,7 +72,7 @@ public class TelegramStateAttribute : Attribute
     {
         MethodInfo? method = type.GetMethods()
             .FirstOrDefault(m => m.GetCustomAttribute<CustomStaticAccessFunctionAttribute>() != null);
-        if (method != null) return message => (bool) method.Invoke(null, new[] {message});
+        if (method != null) return message => (bool) method.Invoke(null, new object?[] {message})!;
         if (type.BaseType == null) return _ => false;
         return GetClassCustomFunction(type.BaseType);
     }

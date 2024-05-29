@@ -11,7 +11,7 @@
 
 namespace TgBotFramework.Core;
 
-public class MessageUpdatedEvent : MessageSendEvent, IStructuredEvent
+public class MessageUpdatedEvent : MessageSendEvent
 {
     public MessageId OldMessageId { get; }
 
@@ -21,6 +21,6 @@ public class MessageUpdatedEvent : MessageSendEvent, IStructuredEvent
         OldMessageId = oldMessageId;
     }
 
-    public string Template => "Сообщение {OldMessageId} изменено в чате {Destination}";
-    public object[] Items => new object[] {OldMessageId, Destination};
+    public new string Template => "Сообщение {OldMessageId} изменено в чате {Destination}";
+    public new object[] Items => new object[] {OldMessageId, Destination};
 }

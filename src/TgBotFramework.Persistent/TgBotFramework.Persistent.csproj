@@ -6,6 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <Version>0.1.0</Version>
+        <Authors>Denis Osipenko</Authors>
+        <Description>Persistent part of framework for creating bots with persistent state storage and authorization capabilities</Description>
+        <PackageTags>Telegram;Bot;Postgre</PackageTags>
+        <RepositoryUrl>https://github.com/opimando/TelegramBotFramework</RepositoryUrl>
+    </PropertyGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\TgBotFramework\TgBotFramework.Core\TgBotFramework.Core.csproj" />
     </ItemGroup>
@@ -18,6 +26,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+        <PackageReference Include="TgBotFramework.Core" Version="0.1.0" />
     </ItemGroup>
 
 </Project>

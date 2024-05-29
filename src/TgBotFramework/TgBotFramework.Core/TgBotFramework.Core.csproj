@@ -5,6 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <Version>0.1.0</Version>
+        <Authors>Denis Osipenko</Authors>
+        <Description>Framework for creating bots with persistent state storage and authorization capabilities</Description>
+        <PackageTags>Telegram;Bot</PackageTags>
+        <RepositoryUrl>https://github.com/opimando/TelegramBotFramework</RepositoryUrl>
+    </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
