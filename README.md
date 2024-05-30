@@ -10,13 +10,13 @@ This framework uses Dependency Injection, so:
 1. **Create a default console/ASP.NET Core project**
 2. **Add the TelegramBotFramework NuGet package**
 3. **Add required usings**:
-```
+```C#
 using TgBotFramework.Core;
 using TgBotFramework.Persistent; //if you need to save to a database
 ```
 4. **Register the necessary services**:
 Configure the services in your `Startup` class (or equivalent):
-```
+```C#
 services
   .InitializeBot(settings.ApiKey, builder =>
     {
@@ -28,12 +28,12 @@ services
 ```
 5. **Apply database migrations (if using a database)**:
 After building the service provider, apply the migrations:
-```
+```C#
 builded.Services.MigrateStateStore();
 ```
 6. **Start the bot**:
 Implement a hosted service to start the bot. For example:
-```
+```C#
 public class TelegramService : IHostedService
 {
     private readonly TelegramBot _bot;
@@ -69,7 +69,7 @@ public class TelegramService : IHostedService
 
 ## Samples
 
-Simple examples can be found in the Samples folder
+Simple examples can be found in the `Samples` folder
 
 ## Contributing
 
