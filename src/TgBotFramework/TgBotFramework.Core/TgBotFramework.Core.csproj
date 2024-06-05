@@ -7,10 +7,12 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <Version>0.1.0</Version>
+        <PackageId>TgBotFramework.Core</PackageId>
+        <Version>0.1.1</Version>
         <Authors>Denis Osipenko</Authors>
         <Description>Framework for creating bots with persistent state storage and authorization capabilities</Description>
         <PackageTags>Telegram;Bot</PackageTags>
+        <PackageProjectUrl>https://github.com/opimando/TelegramBotFramework</PackageProjectUrl>
         <RepositoryUrl>https://github.com/opimando/TelegramBotFramework</RepositoryUrl>
     </PropertyGroup>
 
