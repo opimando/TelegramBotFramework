@@ -24,6 +24,7 @@ public class PollStarted : BaseEvent, IStructuredEvent
         Question = question;
     }
 
-    public string Template => "Стартовало голосование {PollId} с вопросом '{Question}' и вариантами: {Options}";
-    public object[] Items => new object[] {PollId, Question, string.Join(",", Options)};
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "Стартовало голосование {PollId} с вопросом '{Question}' и вариантами: {@Options}";
+    public object[] Items => new object[] {PollId, Question, Options};
 }

@@ -24,9 +24,9 @@ public static class ServiceCollectionExtensions
         var config = new BotBuilder();
         onConfiguration?.Invoke(config);
 
-        config.RegisterStateStore(serviceCollection, config);
-        config.RegisterSpamFilter(serviceCollection, config);
-        config.RegisterAuthProvider(serviceCollection, config);
+        config.StateStoreRegistrationFunction(serviceCollection, config);
+        config.SpamFilterRegistrationFunction(serviceCollection, config);
+        config.AuthProviderRegistrationFunction(serviceCollection, config);
 
         serviceCollection.AddSingleton<IMessenger>(sp => new Messenger(
             apiKey,
@@ -50,7 +50,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton(typeof(IGroupManager), typeof(GroupManager));
         serviceCollection.AddSingleton(typeof(IQueryResolver), typeof(QueryResolver));
 
-        foreach (Action<IServiceCollection, BotBuilder> middleware in config.RegisterMiddlewares)
+        foreach (Action<IServiceCollection, BotBuilder> middleware in config.MiddlewaresRegistrationFunctions)
             middleware.Invoke(serviceCollection, config);
 
         return serviceCollection;

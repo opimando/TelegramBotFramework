@@ -11,7 +11,7 @@
 
 namespace TgBotFramework.Core;
 
-public class ErrorEvent : BaseEvent
+public class ErrorEvent : BaseEvent, IStructuredEvent
 {
     public ErrorEvent(Exception exception)
     {
@@ -28,11 +28,15 @@ public class ErrorEvent : BaseEvent
         Description = description;
     }
 
-    public Exception? Exception { get; set; }
-    public string? Description { get; set; }
+    public Exception? Exception { get; }
+    public string? Description { get; }
 
     public override string ToString()
     {
         return $"Произошла ошибка: {Description ?? Exception?.Message}";
     }
+
+    public virtual LogLevel Level => LogLevel.Error;
+    public virtual string Template => $"Произошла ошибка {Exception}{Description}";
+    public virtual object?[] Items => new object?[] {Exception, Description};
 }

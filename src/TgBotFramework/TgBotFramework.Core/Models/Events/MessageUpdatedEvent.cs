@@ -21,6 +21,6 @@ public class MessageUpdatedEvent : MessageSendEvent
         OldMessageId = oldMessageId;
     }
 
-    public new string Template => "Сообщение {OldMessageId} изменено в чате {Destination}";
-    public new object[] Items => new object[] {OldMessageId, Destination};
+    public override string Template => "Сообщение {OldMessageId} изменено в чате {Destination}";
+    public override object[] Items => new object[] {OldMessageId, Destination};
 }

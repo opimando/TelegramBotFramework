@@ -11,7 +11,7 @@
 
 namespace TgBotFramework.Core;
 
-public class SetBotDescriptionEvent : BaseEvent
+public class SetBotDescriptionEvent : BaseEvent, IStructuredEvent
 {
     public SetBotDescriptionEvent(string newDescription)
     {
@@ -24,4 +24,8 @@ public class SetBotDescriptionEvent : BaseEvent
     {
         return $"Установлено описание бота: {Description}";
     }
+
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "Установлено описание бота: {Description}";
+    public object?[] Items => new object?[] {Description};
 }

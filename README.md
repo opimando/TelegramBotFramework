@@ -1,5 +1,5 @@
 # TelegramBotFramework
-[![package](https://img.shields.io/badge/TgBotFramework.Core-v0.1.1-blue
+[![package](https://img.shields.io/badge/TgBotFramework.Core-v0.1.2-blue
 )](https://www.nuget.org/packages/TgBotFramework.Core/)
 
 Framework for creating bots with persistent state storage and authorization capabilities
@@ -54,7 +54,7 @@ public class TelegramService : IHostedService
             if (evt is IStructuredEvent structuredEvent)
             {
                 //log structuredEvent like 
-                //logger.LogInformation(structuredEvent.Template, structuredEvent.Items);
+                //logger.Log(structuredEvent.Level, structuredEvent.Template, structuredEvent.Items);
             }
             Console.WriteLine($"[{DateTime.Now:dd-MM-yyyy HH:mm:ss}]: {evt}");
         });

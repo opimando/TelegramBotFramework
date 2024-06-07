@@ -20,6 +20,7 @@ public class UserHasNotAccessEvent : BaseEvent, IStructuredEvent
 
     public User User { get; }
 
-    public string Template => "У пользователя {User} нет доступа к боту";
+    public LogLevel Level => LogLevel.Information;
+    public string Template => "У пользователя {@User} нет доступа к боту";
     public object[] Items => new object[] {User};
 }

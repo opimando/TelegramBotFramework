@@ -20,6 +20,7 @@ public class MessageDeletedEvent : BaseEvent, IStructuredEvent
 
     public MessageId DeletedMessageId { get; }
 
+    public LogLevel Level => LogLevel.Debug;
     public string Template => "Сообщение {DeletedMessageId} удалено";
     public object[] Items => new object[] {DeletedMessageId};
 }

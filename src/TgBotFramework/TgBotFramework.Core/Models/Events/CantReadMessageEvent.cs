@@ -20,6 +20,7 @@ public class CantReadMessageEvent : BaseEvent, IStructuredEvent
 
     public string MessageInfo { get; }
 
+    public LogLevel Level => LogLevel.Error;
     public string Template => "Пришёл запрос, но не смогли достать из него сообщение ({MessageInfo})";
     public object[] Items => new object[] {MessageInfo};
 }

@@ -11,17 +11,9 @@
 
 namespace TgBotFramework.Core;
 
-public class TelegramErrorEvent : ErrorEvent
+public class TelegramErrorEvent : ErrorEvent, IStructuredEvent
 {
     public TelegramErrorEvent(Exception exception) : base(exception)
-    {
-    }
-
-    public TelegramErrorEvent(string description) : base(description)
-    {
-    }
-
-    public TelegramErrorEvent(Exception exception, string description) : base(exception, description)
     {
     }
 
@@ -29,4 +21,8 @@ public class TelegramErrorEvent : ErrorEvent
     {
         return $"Поймали ошибку от телеграма: {Description ?? Exception?.Message}";
     }
+
+    public override LogLevel Level => LogLevel.Error;
+    public override string Template => "Получили ошибку от Telegram {@Exception}";
+    public override object[] Items => new object[] {Exception!};
 }

@@ -24,6 +24,7 @@ public class ReceivedMessageEvent : BaseEvent, IStructuredEvent
     public ChatId ChatId { get; }
     public IMessageContent Content { get; }
 
-    public string Template => "Получено сообщение '{Content}' от пользователя {User} в чате {ChatId}";
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "Получено сообщение {@Content} от пользователя {@User} в чате {ChatId}";
     public object[] Items => new object[] {Content, User, ChatId};
 }

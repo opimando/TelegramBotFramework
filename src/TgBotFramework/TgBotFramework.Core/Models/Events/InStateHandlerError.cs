@@ -39,4 +39,9 @@ public class InStateHandlerError : ErrorEvent
     {
         return $"Ошибка в ходе обработки сообщения в чате {ChatId}: {Description ?? Exception?.Message}";
     }
+
+    public override string Template =>
+        "Ошибка в ходе обработки сообщения в чате {ChatId} состоянии {@State}: {@Exception} {Description}";
+
+    public override object?[] Items => new object?[] {ChatId, State, Exception, Description};
 }

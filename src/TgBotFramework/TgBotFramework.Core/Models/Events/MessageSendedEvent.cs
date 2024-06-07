@@ -22,6 +22,7 @@ public class MessageSendEvent : BaseEvent, IStructuredEvent
         Message = message;
     }
 
-    public string Template => "Сообщение {Message} отправлено в чат {Destination}";
-    public object[] Items => new object[] {Message, Destination};
+    public LogLevel Level => LogLevel.Debug;
+    public virtual string Template => "Сообщение {@Message} отправлено в чат {Destination}";
+    public virtual object[] Items => new object[] {Message, Destination};
 }

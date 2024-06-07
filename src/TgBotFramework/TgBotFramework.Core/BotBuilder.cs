@@ -16,12 +16,17 @@ namespace TgBotFramework.Core;
 
 public class BotBuilder
 {
-    public List<Action<IServiceCollection, BotBuilder>> RegisterMiddlewares { get; } = new();
-    public virtual Action<IServiceCollection, BotBuilder> RegisterAuthProvider { get; set; } = (sc, config) => { };
+    public virtual Action<IServiceCollection, BotBuilder> AuthProviderRegistrationFunction { get; set; } =
+        (sc, config) => { };
+
+    public List<Action<IServiceCollection, BotBuilder>> MiddlewaresRegistrationFunctions { get; } = new();
+
+    public virtual Action<IServiceCollection, BotBuilder> SpamFilterRegistrationFunction { get; set; } =
+        (serviceCollection, builder) => { };
 
     protected readonly IStateRegistry StateRegistry = new StateRegistry();
 
-    public virtual Action<IServiceCollection, BotBuilder> RegisterStateStore { get; set; } = (sc, config) =>
+    public virtual Action<IServiceCollection, BotBuilder> StateStoreRegistrationFunction { get; set; } = (sc, config) =>
         sc.AddSingleton<IChatStateStore>(
             sp =>
             {
@@ -34,15 +39,13 @@ public class BotBuilder
 
     public virtual void Use(Func<IServiceProvider, IMessageProcessMiddleware> middlewareCreationFunc)
     {
-        RegisterMiddlewares.Add((sc, _) => sc.AddScoped(middlewareCreationFunc));
+        MiddlewaresRegistrationFunctions.Add((sc, _) => sc.AddScoped(middlewareCreationFunc));
     }
 
-    public virtual void UseScoped<T>() where T : IMessageProcessMiddleware
+    public virtual void UseTransient<T>() where T : IMessageProcessMiddleware
     {
-        RegisterMiddlewares.Add((sc, _) => sc.AddScoped(typeof(IMessageProcessMiddleware), typeof(T)));
+        MiddlewaresRegistrationFunctions.Add((sc, _) => sc.AddTransient(typeof(IMessageProcessMiddleware), typeof(T)));
     }
-
-    public virtual Action<IServiceCollection, BotBuilder> RegisterSpamFilter { get; set; } = (_, _) => { };
 
     /// <summary>
     /// Зарегистрировать все телеграм-комманды в сборках
@@ -67,13 +70,14 @@ public class BotBuilder
 
     public virtual BotBuilder WithSingleAuthProvider(UserId userId)
     {
-        RegisterAuthProvider = (sc, _) => sc.AddSingleton<IAuthProvider>(new SingleUserAuthProvider(userId));
+        AuthProviderRegistrationFunction =
+            (sc, _) => sc.AddSingleton<IAuthProvider>(new SingleUserAuthProvider(userId));
         return this;
     }
 
     public virtual BotBuilder WithGroupAuthProvider(ChatId groupId)
     {
-        RegisterAuthProvider = (sc, _) =>
+        AuthProviderRegistrationFunction = (sc, _) =>
             sc.AddSingleton<IAuthProvider>(sp =>
                 new AuthProviderByContainsInGroup(sp.GetRequiredService<IGroupManager>(), groupId));
         return this;
@@ -81,25 +85,26 @@ public class BotBuilder
 
     public virtual BotBuilder WithAuthProvider(IAuthProvider provider)
     {
-        RegisterAuthProvider = (sc, _) => sc.AddSingleton(provider);
+        AuthProviderRegistrationFunction = (sc, _) => sc.AddSingleton(provider);
         return this;
     }
 
     public virtual BotBuilder WithStateStore(IChatStateStore stateStore)
     {
-        RegisterStateStore = (sc, _) => sc.AddSingleton(stateStore);
+        StateStoreRegistrationFunction = (sc, _) => sc.AddSingleton(stateStore);
         return this;
     }
 
     public virtual BotBuilder WithSpamFilter(ISpamSenderFilter filter)
     {
-        RegisterSpamFilter = (sc, _) => sc.AddSingleton(filter);
+        SpamFilterRegistrationFunction = (sc, _) => sc.AddSingleton(filter);
         return this;
     }
 
     public virtual BotBuilder WithSpamFilter(int maxCountPerMinute)
     {
-        RegisterSpamFilter = (sc, _) => sc.AddScoped<ISpamSenderFilter>(_ => new SpamSenderFilter(maxCountPerMinute));
+        SpamFilterRegistrationFunction = (sc, _) =>
+            sc.AddScoped<ISpamSenderFilter>(_ => new SpamSenderFilter(maxCountPerMinute));
         return this;
     }
 

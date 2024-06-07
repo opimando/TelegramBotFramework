@@ -11,7 +11,7 @@
 
 namespace TgBotFramework.Core;
 
-public class ReceivedUpdateEvent : BaseEvent
+public class ReceivedUpdateEvent : BaseEvent, IStructuredEvent
 {
     public ReceivedUpdateEvent(string meta)
     {
@@ -24,4 +24,8 @@ public class ReceivedUpdateEvent : BaseEvent
     {
         return $"Получено уведомление от телеграма {Meta}";
     }
+
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "Получено уведомление от телеграма {Meta}";
+    public object?[] Items => new object?[] {Meta};
 }

@@ -11,7 +11,7 @@
 
 namespace TgBotFramework.Core;
 
-public class SetBotCommandsEvent : BaseEvent
+public class SetBotCommandsEvent : BaseEvent, IStructuredEvent
 {
     public SetBotCommandsEvent(List<CommandButton> commands)
     {
@@ -24,4 +24,9 @@ public class SetBotCommandsEvent : BaseEvent
     {
         return $"Установлены команды бота: {string.Join("; ", Commands)}";
     }
+
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "Установлены команды бота: {@Commands}";
+
+    public object?[] Items => new object?[] {Commands};
 }

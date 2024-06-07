@@ -13,6 +13,7 @@ namespace TgBotFramework.Core;
 
 public interface IStructuredEvent
 {
+    LogLevel Level { get; }
     string Template { get; }
-    object[] Items { get; }
+    object?[] Items { get; }
 }

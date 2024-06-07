@@ -24,8 +24,8 @@ public class UserStateChangedEvent : BaseEvent, IStructuredEvent
         NewState = newState;
     }
 
-    public string Template => "В чате {ChatId} изменено состояние с {OldState} на {NewState}";
+    public LogLevel Level => LogLevel.Debug;
+    public string Template => "В чате {ChatId} изменено состояние с {@OldState} на {@NewState}";
 
-    public object[] Items => new object[]
-        {ChatId, OldState?.GetType().Name ?? "null", NewState?.GetType().Name ?? "null"};
+    public object?[] Items => new object?[] {ChatId, OldState, NewState};
 }

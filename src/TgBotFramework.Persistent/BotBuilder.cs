@@ -18,7 +18,7 @@ public static class BotBuilderExtensions
 {
     public static BotBuilder WithPersistentStore(this BotBuilder builder)
     {
-        builder.RegisterStateStore = (sc, config) =>
+        builder.StateStoreRegistrationFunction = (sc, config) =>
             sc.AddScoped<IChatStateStore>(sp =>
             {
                 var store = new PersistentChatStateStore(
