@@ -19,7 +19,7 @@ public static class BotBuilderExtensions
     public static BotBuilder WithPersistentStore(this BotBuilder builder)
     {
         builder.StateStoreRegistrationFunction = (sc, config) =>
-            sc.AddScoped<IChatStateStore>(sp =>
+            sc.AddTransient<IChatStateStore>(sp =>
             {
                 var store = new PersistentChatStateStore(
                     sp.GetRequiredService<IStateRepository>(),

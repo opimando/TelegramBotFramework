@@ -11,16 +11,17 @@
 
 namespace TgBotFramework.Core;
 
-public class AudioContent : BaseFileContent
+public class AudioContent : CaptionContent
 {
-    public AudioContent(string fileId, string? fileName, string uniqueFileId, int durationSec, string? title) : base(
-        fileId, uniqueFileId, fileName)
+    public AudioContent(string fileId, string? fileName, string uniqueFileId, int durationSec, string? title,
+        string? caption = null) : base(
+        fileId, uniqueFileId, fileName, caption)
     {
         Title = title;
         Duration = TimeSpan.FromSeconds(durationSec);
     }
 
-    public AudioContent(Stream fileData, string fileName) : base(fileData, fileName)
+    public AudioContent(Stream fileData, string fileName, string? caption = null) : base(fileData, fileName, caption)
     {
     }
 

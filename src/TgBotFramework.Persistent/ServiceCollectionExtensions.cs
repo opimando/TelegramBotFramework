@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         string connectionString
     )
     {
-        serviceCollection.AddScoped(typeof(IStateRepository), typeof(StateRepository));
+        serviceCollection.AddTransient(typeof(IStateRepository), typeof(StateRepository));
         serviceCollection.AddDbContextFactory<TelegramContext>((_, builder) =>
         {
             builder.UseNpgsql(connectionString);

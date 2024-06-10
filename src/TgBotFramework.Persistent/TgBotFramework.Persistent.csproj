@@ -8,7 +8,7 @@
 
     <PropertyGroup>
         <PackageId>TgBotFramework.Persistent</PackageId>
-        <Version>0.1.1</Version>
+        <Version>0.1.6</Version>
         <Authors>Denis Osipenko</Authors>
         <Description>Persistent part of framework for creating bots with persistent state storage and authorization capabilities</Description>
         <PackageTags>Telegram;Bot;Postgre</PackageTags>
@@ -28,7 +28,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.10" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
-        <PackageReference Include="TgBotFramework.Core" Version="0.1.0" />
+        <PackageReference Include="TgBotFramework.Core" Version="0.1.6" />
     </ItemGroup>
 
 </Project>

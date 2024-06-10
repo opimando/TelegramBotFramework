@@ -49,6 +49,7 @@ internal static class ContentExtensions
             content.Data == null
                 ? InputFile.FromFileId(content.FileId)
                 : InputFile.FromStream(content.Data, content.FileName),
+            caption: content.Caption,
             replyToMessageId: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
@@ -71,6 +72,7 @@ internal static class ContentExtensions
             content.Data == null
                 ? InputFile.FromFileId(content.FileId)
                 : InputFile.FromStream(content.Data, content.FileName),
+            caption: content.Caption,
             replyToMessageId: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
@@ -88,11 +90,21 @@ internal static class ContentExtensions
         IReplyMarkup? markup,
         MessageId? replyTo)
     {
+        InputFile data;
+        if (content.Data == null)
+        {
+            data = InputFile.FromFileId(content.FileId);
+        }
+        else
+        {
+            content.Data.Position = 0;
+            data = InputFile.FromStream(content.Data, content.FileName);
+        }
+
         Telegram.Bot.Types.Message ret = await client.SendPhotoAsync(
             chatId.Id,
-            content.Data == null
-                ? InputFile.FromFileId(content.FileId)
-                : InputFile.FromStream(content.Data, content.FileName),
+            data,
+            caption: content.Caption,
             replyToMessageId: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
@@ -228,6 +240,7 @@ internal static class ContentExtensions
             file,
             replyToMessageId: replyTo?.Id,
             replyMarkup: markup,
+            caption: content.Caption,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
             parseMode: sendInfo.ParseMode.GetParseMode()

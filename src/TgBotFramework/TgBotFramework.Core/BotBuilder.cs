@@ -39,7 +39,7 @@ public class BotBuilder
 
     public virtual void Use(Func<IServiceProvider, IMessageProcessMiddleware> middlewareCreationFunc)
     {
-        MiddlewaresRegistrationFunctions.Add((sc, _) => sc.AddScoped(middlewareCreationFunc));
+        MiddlewaresRegistrationFunctions.Add((sc, _) => sc.AddSingleton(middlewareCreationFunc));
     }
 
     public virtual void UseTransient<T>() where T : IMessageProcessMiddleware
@@ -104,7 +104,7 @@ public class BotBuilder
     public virtual BotBuilder WithSpamFilter(int maxCountPerMinute)
     {
         SpamFilterRegistrationFunction = (sc, _) =>
-            sc.AddScoped<ISpamSenderFilter>(_ => new SpamSenderFilter(maxCountPerMinute));
+            sc.AddTransient<ISpamSenderFilter>(_ => new SpamSenderFilter(maxCountPerMinute));
         return this;
     }
 

@@ -11,17 +11,18 @@
 
 namespace TgBotFramework.Core;
 
-public class ImageContent : BaseFileContent
+public class ImageContent : CaptionContent
 {
-    public ImageContent(string fileId, string uniqueFileId, long? fileSize, int width, int height) : base(fileId,
-        uniqueFileId, string.Empty)
+    public ImageContent(string fileId, string uniqueFileId, long? fileSize, int width, int height,
+        string? caption = null) : base(fileId,
+        uniqueFileId, string.Empty, caption)
     {
         FileSize = fileSize;
         Width = width;
         Height = height;
     }
 
-    public ImageContent(Stream fileData, string fileName) : base(fileData, fileName)
+    public ImageContent(Stream fileData, string fileName, string? caption = null) : base(fileData, fileName, caption)
     {
     }
 
