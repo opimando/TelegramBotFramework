@@ -16,13 +16,13 @@ namespace TgBotFramework.Core;
 
 public class TelegramBot : ITelegramBot
 {
-    private readonly TelegramBotClient _client;
+    private readonly ITelegramBotClient _client;
     private readonly IEventBus _eventBus;
     private readonly IMessageProcessQueue _messageQueue;
     private readonly IAuthProvider? _authProvider;
 
-    public TelegramBot(TelegramBotClient client, IEventBus eventBus, IMessageProcessQueue messageQueue,
-        IAuthProvider? authProvider)
+    public TelegramBot(ITelegramBotClient client, IEventBus eventBus, IMessageProcessQueue messageQueue,
+        IAuthProvider? authProvider = null)
     {
         _client = client;
         _eventBus = eventBus;

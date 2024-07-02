@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <None Update="settings.json">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

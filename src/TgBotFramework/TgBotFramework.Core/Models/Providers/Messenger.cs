@@ -19,19 +19,13 @@ public class Messenger : IMessenger
     private readonly ISpamSenderFilter? _spamFilter;
     private readonly IEventBus _eventBus;
 
-    public TelegramBotClient Client { get; }
+    public ITelegramBotClient Client { get; }
 
-    public Messenger(string apiKey,
-        IEventBus eventBus,
-        TimeSpan? requestTimeout = null,
-        ISpamSenderFilter? spamFilter = null)
+    public Messenger(ITelegramBotClient client, IEventBus eventBus, ISpamSenderFilter? spamFilter = null)
     {
+        Client = client;
         _spamFilter = spamFilter;
         _eventBus = eventBus;
-        Client = new TelegramBotClient(apiKey)
-        {
-            Timeout = requestTimeout ?? TimeSpan.FromMinutes(1)
-        };
     }
 
     private async Task<MessageId> InternalSendMessage(ChatId chatId, SendInfo sendMessageInfo,

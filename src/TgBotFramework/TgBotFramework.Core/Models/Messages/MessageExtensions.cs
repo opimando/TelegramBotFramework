@@ -61,6 +61,16 @@ public static class MessageExtensions
             content = new LocationContent(message.Location.Latitude, message.Location.Longitude,
                 message.Location.LivePeriod);
         }
+        else if (message.VideoNote != null)
+        {
+            ImageContent? preview = message.VideoNote.Thumbnail == null
+                ? null
+                : new ImageContent(message.VideoNote.Thumbnail.FileId, message.VideoNote.Thumbnail.FileUniqueId,
+                    message.VideoNote.Thumbnail.FileSize, message.VideoNote.Thumbnail.Width,
+                    message.VideoNote.Thumbnail.Height);
+            content = new VideoNoteContent(message.VideoNote.FileId, message.VideoNote.FileUniqueId,
+                message.VideoNote.FileSize, message.VideoNote.Duration, preview);
+        }
         else if (message.Video != null)
         {
             ImageContent? preview = message.Video.Thumbnail == null
@@ -72,15 +82,10 @@ public static class MessageExtensions
         }
         else if (message.Photo != null)
         {
-            List<ImageContent> photos = new();
-            foreach (PhotoSize photo in message.Photo)
-                photos.Add(new ImageContent(photo.FileId, photo.FileUniqueId,
-                    photo.FileSize, photo.Width, photo.Height));
+            PhotoSize theBiggestPhoto = message.Photo.MaxBy(s => s.FileSize ?? s.Width)!;
 
-            if (photos.Count == 1)
-                content = photos[0];
-            else
-                content = new ImageGroupContent(message.MediaGroupId, photos);
+            content = new ImageContent(theBiggestPhoto.FileId, theBiggestPhoto.FileUniqueId,
+                theBiggestPhoto.FileSize, theBiggestPhoto.Width, theBiggestPhoto.Height);
         }
         else if (message.Voice != null)
         {

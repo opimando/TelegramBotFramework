@@ -14,7 +14,7 @@ namespace TgBotFramework.Core;
 public class VideoContent : ImageContent
 {
     public ImageContent? Preview { get; }
-    public TimeSpan Duration { get; }
+    public TimeSpan? Duration { get; }
 
     public VideoContent(string fileId, string uniqueFileId, long? fileSize, int width, int height, int durationSec,
         ImageContent? preview) : base(fileId, uniqueFileId, fileSize, width, height)

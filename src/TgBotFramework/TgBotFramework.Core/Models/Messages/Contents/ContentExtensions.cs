@@ -19,7 +19,7 @@ internal static class ContentExtensions
 {
     public static async Task<MessageId> Send(
         this BaseFileContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -30,6 +30,7 @@ internal static class ContentExtensions
             VoiceContent voice => await voice.Send(client, chatId, sendInfo, markup, replyTo),
             AudioContent audio => await audio.Send(client, chatId, sendInfo, markup, replyTo),
             DocumentContent doc => await doc.Send(client, chatId, sendInfo, markup, replyTo),
+            VideoNoteContent note => await note.Send(client, chatId, sendInfo, markup, replyTo),
             VideoContent video => await video.Send(client, chatId, sendInfo, markup, replyTo),
             ImageContent image => await image.Send(client, chatId, sendInfo, markup, replyTo),
             _ => throw new ArgumentOutOfRangeException("Не поддерживаемый тип контента")
@@ -38,7 +39,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this AudioContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -61,7 +62,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this DocumentContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -84,7 +85,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this ImageContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -116,7 +117,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this ContactContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -137,7 +138,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this ImageGroupContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         MessageId? replyTo)
@@ -177,7 +178,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this LocationContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -201,7 +202,7 @@ internal static class ContentExtensions
     }
 
     public static async Task<MessageId> Send(this TextContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -223,7 +224,7 @@ internal static class ContentExtensions
 
     public static async Task<MessageId> Send(
         this VideoContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,
@@ -249,8 +250,34 @@ internal static class ContentExtensions
     }
 
     public static async Task<MessageId> Send(
+        this VideoNoteContent content,
+        ITelegramBotClient client,
+        ChatId chatId,
+        SendInfo sendInfo,
+        IReplyMarkup? markup,
+        MessageId? replyTo)
+    {
+        InputFile file;
+        if (content.Data != null)
+            file = InputFile.FromStream(content.Data, content.FileName ?? Guid.NewGuid().ToString());
+        else
+            file = InputFile.FromFileId(content.FileId);
+
+        Telegram.Bot.Types.Message ret = await client.SendVideoNoteAsync(
+            chatId.Id,
+            file,
+            replyToMessageId: replyTo?.Id,
+            replyMarkup: markup,
+            duration: (int?) (content.Duration?.TotalSeconds ?? null),
+            disableNotification: sendInfo.HideNotification,
+            protectContent: sendInfo.Protected.IsContentProtected()
+        );
+        return ret.MessageId;
+    }
+
+    public static async Task<MessageId> Send(
         this VoiceContent content,
-        TelegramBotClient client,
+        ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
         IReplyMarkup? markup,

@@ -28,27 +28,21 @@ public static class ServiceCollectionExtensions
         config.SpamFilterRegistrationFunction(serviceCollection, config);
         config.AuthProviderRegistrationFunction(serviceCollection, config);
 
-        serviceCollection.AddSingleton<IMessenger>(sp => new Messenger(
-            apiKey,
-            sp.GetRequiredService<IEventBus>(),
-            spamFilter: sp.GetService<ISpamSenderFilter>()
-        ));
-        serviceCollection.AddSingleton(typeof(ITelegramBotClient),
-            sp => (sp.GetRequiredService<IMessenger>() as Messenger)!.Client);
+        serviceCollection.AddSingleton<ITelegramBotClient>(
+            _ => new TelegramBotClient(apiKey) {Timeout = TimeSpan.FromMinutes(1)}
+        );
 
-        serviceCollection.AddSingleton<TelegramBot>(sp => new TelegramBot(
-            (sp.GetRequiredService<IMessenger>() as Messenger)!.Client,
-            sp.GetRequiredService<IEventBus>(),
-            sp.GetRequiredService<IMessageProcessQueue>(),
-            sp.GetService<IAuthProvider>()
-        ));
+        serviceCollection.AddTransient<IMessenger, Messenger>();
+        serviceCollection.AddSingleton<TelegramBot>();
 
-        serviceCollection.AddSingleton(typeof(IEventBus), typeof(EventBus));
-        serviceCollection.AddSingleton(typeof(IMessageProcessor), typeof(MessageProcessor));
-        serviceCollection.AddSingleton(typeof(IMessageProcessQueue), typeof(MessageProcessQueue));
-        serviceCollection.AddSingleton(typeof(IChatStateFactory), typeof(ChatStateFactory));
-        serviceCollection.AddSingleton(typeof(IGroupManager), typeof(GroupManager));
-        serviceCollection.AddSingleton(typeof(IQueryResolver), typeof(QueryResolver));
+        serviceCollection.AddSingleton<IEventBus, EventBus>();
+        serviceCollection.AddSingleton<IMessageProcessQueue, MessageProcessQueue>();
+
+        serviceCollection.AddTransient<IMessageProcessor, MessageProcessor>();
+        serviceCollection.AddTransient<IChatStateFactory, ChatStateFactory>();
+        serviceCollection.AddTransient<IGroupManager, GroupManager>();
+        serviceCollection.AddTransient<IQueryResolver, QueryResolver>();
+        serviceCollection.AddTransient<IFileProvider, FileProvider>();
 
         foreach (Action<IServiceCollection, BotBuilder> middleware in config.MiddlewaresRegistrationFunctions)
             middleware.Invoke(serviceCollection, config);
