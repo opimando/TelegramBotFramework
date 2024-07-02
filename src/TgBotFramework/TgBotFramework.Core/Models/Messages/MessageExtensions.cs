@@ -98,11 +98,18 @@ public static class MessageExtensions
             throw new ArgumentOutOfRangeException(nameof(message), "Не удалось получить контет сообщения");
         }
 
-        return new Message(
+        InnerMessage? reply = null;
+        User? forwardedFrom = null;
+        if (message.ReplyToMessage != null) reply = message.ReplyToMessage.GetMessage();
+        if (message.ForwardFrom != null) forwardedFrom = message.ForwardFrom.GetLocal();
+
+        return new InnerMessage(
             message.MessageId,
             content,
-            message.From.Id,
-            message.From.GetLocal()
+            message.From!.Id,
+            message.From.GetLocal(),
+            reply,
+            forwardedFrom
         );
     }
 

@@ -22,12 +22,12 @@ public abstract class BaseSelfDeleteMessagesState : BaseChatState, IChatStateWit
     {
     }
 
-    public MessageToDeleteArgument GetData()
+    public virtual MessageToDeleteArgument GetData()
     {
         return Data;
     }
 
-    public Task SetData(MessageToDeleteArgument data)
+    public virtual Task SetData(MessageToDeleteArgument data)
     {
         Data = data;
         return Task.CompletedTask;

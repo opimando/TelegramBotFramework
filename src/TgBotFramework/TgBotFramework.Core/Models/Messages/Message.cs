@@ -18,7 +18,8 @@ public class Message
         IMessageContent content,
         ChatId chatId,
         User from,
-        MessageId? replayTo = null
+        Message? replayTo = null,
+        User? forwardedFrom = null
     )
     {
         Id = id;
@@ -26,13 +27,15 @@ public class Message
         ChatId = chatId;
         From = from;
         ReplyTo = replayTo;
+        ForwardedFrom = forwardedFrom;
     }
 
     public MessageId Id { get; }
     public IMessageContent Content { get; }
     public ChatId ChatId { get; }
     public User From { get; }
-    public MessageId? ReplyTo { get; }
+    public Message? ReplyTo { get; }
+    public User? ForwardedFrom { get; }
     public DateTime Created { get; } = DateTime.Now;
 
     public override string ToString()
