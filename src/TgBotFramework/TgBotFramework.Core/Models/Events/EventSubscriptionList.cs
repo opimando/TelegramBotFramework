@@ -30,10 +30,7 @@ internal class EventSubscriptionList
     {
         lock (_lockObject)
         {
-            var newItem = new SubscriptionActionItem
-            {
-                Action = evt => handler((T) evt)
-            };
+            var newItem = new SubscriptionActionItem(@event => handler((T) @event));
             _handlers.Add(newItem);
             return newItem.Id;
         }
@@ -98,6 +95,11 @@ internal class EventSubscriptionList
     private class SubscriptionActionItem
     {
         public Guid Id { get; } = Guid.NewGuid();
-        public Action<BaseEvent> Action { get; init; }
+        public Action<BaseEvent> Action { get; }
+
+        public SubscriptionActionItem(Action<BaseEvent> action)
+        {
+            Action = action;
+        }
     }
 }

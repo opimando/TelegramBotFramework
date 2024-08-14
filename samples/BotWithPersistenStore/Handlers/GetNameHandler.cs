@@ -17,12 +17,12 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
 {
     private readonly IChatStateFactory _stateFactory;
 
-    public GetNameHandler(IEventBus eventsBus, IChatStateFactory stateFactory) : base(eventsBus)
+    public GetNameHandler(IChatStateFactory stateFactory)
     {
         _stateFactory = stateFactory;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
         Data.Add(receivedMessage.Id);
 
@@ -30,7 +30,7 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
             .Any(char.IsDigit)) //провалидируем, например, на наличие цифр
         {
             MessageId messageId =
-                await messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
+                await Messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
             Data.Add(messageId);
             return this;
         }
@@ -38,7 +38,7 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
         string data = (receivedMessage.Content as TextContent)!.Content;
 
         var next = await _stateFactory.CreateState<GetLastNameHandler>(
-            new LastnameArgument {FirstName = data}
+            new NameArgument {FirstName = data}
         );
 
         return next;

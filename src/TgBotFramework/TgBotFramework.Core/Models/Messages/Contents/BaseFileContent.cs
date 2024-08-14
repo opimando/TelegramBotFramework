@@ -27,7 +27,7 @@ public abstract class BaseFileContent : IMessageContent, IDisposable
         FileName = fileName;
     }
 
-    public Stream? Data { get; }
+    public MemoryStream? Data { get; }
     public string FileId { get; } = string.Empty;
     public string? FileName { get; }
     public string UniqueFileId { get; } = string.Empty;

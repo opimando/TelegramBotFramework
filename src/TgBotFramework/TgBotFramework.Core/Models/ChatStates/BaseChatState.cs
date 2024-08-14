@@ -16,10 +16,15 @@ namespace TgBotFramework.Core;
 /// </summary>
 public abstract class BaseChatState : IChatState
 {
+    /// <summary>
+    /// Проставляется при создании, в конструктор не выношу чтобы не увеличить количество аргументов у наследников
+    /// </summary>
+    public IMessenger Messenger { get; set; } = default!;
+
+    public IEventBus EventsBus { get; set; } = default!;
+    
     public virtual StatePriority Priority => StatePriority.CanBeIgnored;
     public virtual Guid SessionId { get; set; } = Guid.NewGuid();
-
-    protected readonly IEventBus EventsBus;
 
     /// <summary>
     /// Если в этом состоянии впервые, то флажок равен true.
@@ -27,25 +32,20 @@ public abstract class BaseChatState : IChatState
     /// </summary>
     protected bool IsFirstStateInvoke;
 
-    public BaseChatState(IEventBus eventsBus)
-    {
-        EventsBus = eventsBus;
-    }
-
     #region Protected methods
 
     #region Abstract methods
 
-    protected abstract Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger);
+    protected abstract Task<IChatState?> InternalProcessMessage(Message receivedMessage);
 
     #endregion Abstract methods
 
-    protected virtual Task OnStateStartInternal(IMessenger messenger, ChatId chatId)
+    protected virtual Task OnStateStartInternal(ChatId chatId)
     {
         return Task.CompletedTask;
     }
 
-    protected virtual Task OnStateExitInternal(IMessenger messenger, ChatId chatId)
+    protected virtual Task OnStateExitInternal(ChatId chatId)
     {
         return Task.CompletedTask;
     }
@@ -56,18 +56,18 @@ public abstract class BaseChatState : IChatState
         return Task.CompletedTask;
     }
 
-    protected virtual async Task SendError(IMessenger messenger, ChatId chatId, string message)
+    protected virtual async Task SendError(ChatId chatId, string message)
     {
-        await messenger.Send(chatId, new SendInfo(new TextContent(message)));
+        await Messenger.Send(chatId, new SendInfo(new TextContent(message)));
     }
 
     #endregion Protected methods
 
-    public virtual async Task<IChatState?> ProcessMessage(Message receivedMessage, IMessenger messenger)
+    public virtual async Task<IChatState?> ProcessMessage(Message receivedMessage)
     {
         try
         {
-            return await InternalProcessMessage(receivedMessage, messenger);
+            return await InternalProcessMessage(receivedMessage);
         }
         catch (Exception ex)
         {
@@ -79,7 +79,7 @@ public abstract class BaseChatState : IChatState
             }
 
             await PublishError(receivedMessage.ChatId, ex, string.Empty);
-            await SendError(messenger, receivedMessage.ChatId, ex.Message);
+            await SendError(receivedMessage.ChatId, ex.Message);
         }
         finally
         {
@@ -89,12 +89,12 @@ public abstract class BaseChatState : IChatState
         return this;
     }
 
-    public virtual async Task OnStateStart(IMessenger messenger, ChatId chatId)
+    public virtual async Task OnStateStart(ChatId chatId)
     {
         IsFirstStateInvoke = true;
         try
         {
-            await OnStateStartInternal(messenger, chatId);
+            await OnStateStartInternal(chatId);
         }
         catch (Exception ex)
         {
@@ -109,11 +109,11 @@ public abstract class BaseChatState : IChatState
         }
     }
 
-    public virtual async Task OnStateExit(IMessenger messenger, ChatId chatId)
+    public virtual async Task OnStateExit(ChatId chatId)
     {
         try
         {
-            await OnStateExitInternal(messenger, chatId);
+            await OnStateExitInternal(chatId);
         }
         catch (Exception ex)
         {

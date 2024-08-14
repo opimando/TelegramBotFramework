@@ -111,7 +111,7 @@ public class MessageProcessor : IMessageProcessor
             if (state == null)
                 return null;
 
-            return await state.ProcessMessage(message, _messenger);
+            return await state.ProcessMessage(message);
         }
         catch (Exception ex)
         {

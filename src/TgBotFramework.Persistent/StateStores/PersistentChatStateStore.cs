@@ -20,23 +20,22 @@ public class PersistentChatStateStore : BaseStateStore
     public PersistentChatStateStore(
         IStateRepository stateRepository,
         IChatStateFactory stateFactory,
-        IEventBus eventsBus,
-        IMessenger messenger
+        IEventBus eventsBus
     ) : base(
-        stateFactory, eventsBus, messenger)
+        stateFactory, eventsBus)
     {
         _stateRepository = stateRepository;
     }
 
     public override Task SaveState(ChatId chatId, IChatState? newState)
     {
-        StateArgument? arg = newState.GetArgumentByReflectionIfExist();
+        StateArgument?[] arg = newState.GetArgumentByReflectionIfExist();
 
         var state = new ChatStateEntity
         {
             ChatId = chatId.ToString(),
             SessionId = newState?.SessionId,
-            Argument = arg,
+            Argument = arg.Any() ? arg : null,
             Type = newState?.GetType()
         };
 
@@ -47,12 +46,23 @@ public class PersistentChatStateStore : BaseStateStore
     {
         ChatStateEntity? dbState = await _stateRepository.Get(chatId.Id.ToString());
         if (dbState?.Type == null) return null;
-        var argument = dbState.Argument as StateArgument;
+        List<StateArgument?> arguments = new();
 
-        IChatState state = await StateFactory.CreateState(dbState.Type, argument);
+        if (dbState.Argument != null)
+            switch (dbState.Argument)
+            {
+                case StateArgument stArg:
+                    arguments.Add(stArg);
+                    break;
+                case StateArgument?[] list:
+                    arguments.AddRange(list);
+                    break;
+            }
+
+        IChatState state = await StateFactory.CreateState(dbState.Type, arguments.ToArray());
         state.SessionId = dbState.SessionId ?? Guid.NewGuid();
-        if (argument != null && state.IsDataState())
-            await state.SetArgumentByReflection(argument);
+        if (arguments.Any() && state.IsDataState())
+            await state.SetArgumentByReflection(arguments.ToArray());
 
         return state;
     }

@@ -17,8 +17,7 @@ public class InMemoryStateStore : BaseStateStore
 {
     private readonly ConcurrentDictionary<ChatId, IChatState?> _userStates = new();
 
-    public InMemoryStateStore(IChatStateFactory stateFactory, IEventBus eventsBus, IMessenger messenger) : base(
-        stateFactory, eventsBus, messenger)
+    public InMemoryStateStore(IChatStateFactory stateFactory, IEventBus eventsBus) : base(stateFactory, eventsBus)
     {
     }
 

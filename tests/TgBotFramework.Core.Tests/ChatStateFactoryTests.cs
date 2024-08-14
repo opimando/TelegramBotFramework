@@ -69,7 +69,7 @@ public class ChatStateFactoryTests
 
         Assert.NotNull(state);
         Assert.IsType<StatefulState>(state);
-        StatefulArgument recovered = state.GetData();
+        StatefulArgument recovered = (state as IChatStateWithData<StatefulArgument>)!.GetData();
         Assert.Equal(argument.SomeInt, recovered.SomeInt);
     }
 
@@ -83,7 +83,7 @@ public class ChatStateFactoryTests
 
         Assert.NotNull(state);
         Assert.IsType<StatefulState2>(state);
-        StatefulArgument recovered = state.GetData();
+        StatefulArgument recovered = (state as IChatStateWithData<StatefulArgument>)!.GetData();
         Assert.Equal(argument.SomeInt, recovered.SomeInt);
     }
 
@@ -94,7 +94,7 @@ public class ChatStateFactoryTests
 
         Assert.NotNull(state);
         Assert.IsType<StatefulState>(state);
-        StatefulArgument recovered = state.GetData();
+        StatefulArgument recovered = (state as IChatStateWithData<StatefulArgument>)!.GetData();
         Assert.NotNull(recovered);
     }
 
@@ -127,7 +127,7 @@ public class ChatStateFactoryTests
 
         Assert.NotNull(state);
         Assert.IsType<StatefulState>(state);
-        StatefulArgument recovered = (state as StatefulState).GetData();
+        StatefulArgument recovered = (state as IChatStateWithData<StatefulArgument>)!.GetData();
         Assert.Equal(argument.SomeInt, recovered.SomeInt);
     }
 
@@ -138,8 +138,40 @@ public class ChatStateFactoryTests
 
         Assert.NotNull(state);
         Assert.IsType<StatefulState>(state);
-        StatefulArgument recovered = (state as StatefulState).GetData();
+        StatefulArgument recovered = (state as IChatStateWithData<StatefulArgument>)!.GetData();
         Assert.NotNull(recovered);
+    }
+
+    [Fact]
+    public async Task CreateState_WithSetDefaultServices_Created()
+    {
+        _serviceProvider.Setup(i => i.GetService(typeof(IMessenger))).Returns(Mock.Of<IMessenger>());
+        _serviceProvider.Setup(i => i.GetService(typeof(IEventBus))).Returns(Mock.Of<IEventBus>());
+
+        BaseChatState state = await _stateFactory.CreateState<SomeBaseChildState>();
+
+        Assert.NotNull(state.Messenger);
+        Assert.NotNull(state.EventsBus);
+    }
+
+    [Fact]
+    public async Task CreateState_WithArgs_Created()
+    {
+        var firstArg = new StatefulArgument {SomeInt = 333};
+        var state = await _stateFactory.CreateState<SomeState>(firstArg);
+
+        Assert.NotNull(state);
+        Assert.Equal(firstArg.SomeInt, state.GetData().SomeInt);
+
+        StatefulArgument arg = state.GetData();
+        var newArg = new SomeExtendedArg {SomeInt = arg.SomeInt};
+
+        var state2 = await _stateFactory.CreateState<WithExtendedArgState>(newArg);
+
+        Assert.NotNull(state);
+        Assert.IsType<SomeExtendedArg>(state2.GetData());
+        Assert.Equal(newArg.SomeInt, state2.GetData().SomeInt);
+        Assert.Equal(newArg.ExtendedString, (state2.GetData() as SomeExtendedArg)!.ExtendedString);
     }
 
     internal enum ActionType
@@ -154,19 +186,19 @@ public class ChatStateFactoryTests
         public Guid SessionId { get; set; } = Guid.NewGuid();
         internal Action<ActionType>? OnAction { get; set; }
 
-        public Task<IChatState?> ProcessMessage(Message receivedMessage, IMessenger messenger)
+        public Task<IChatState?> ProcessMessage(Message receivedMessage)
         {
             OnAction?.Invoke(ActionType.Process);
             return Task.FromResult((IChatState) null);
         }
 
-        public Task OnStateStart(IMessenger messenger, ChatId chatId)
+        public Task OnStateStart(ChatId chatId)
         {
             OnAction?.Invoke(ActionType.Start);
             return Task.CompletedTask;
         }
 
-        public Task OnStateExit(IMessenger messenger, ChatId chatId)
+        public Task OnStateExit(ChatId chatId)
         {
             OnAction?.Invoke(ActionType.Exit);
             return Task.CompletedTask;
@@ -191,6 +223,15 @@ public class ChatStateFactoryTests
         }
     }
 
+    public class SomeBaseChildState : BaseChatState
+    {
+        /// <inheritdoc />
+        protected override Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class StatefulState2 : StatefulState
     {
         public StatefulState2(ISomeInterface service)
@@ -198,19 +239,78 @@ public class ChatStateFactoryTests
         }
     }
 
-    public class StatefulState : TestState, IChatStateWithData<StatefulArgument>
+    public class AnotherArgument : StateArgument
+    {
+        public int ZXC { get; set; } = new Random().Next();
+    }
+
+    public class WithExtendedArgState : SomeState
+    {
+        private SomeExtendedArg _extended => (SomeExtendedArg) Argument;
+
+        public override StatefulArgument GetData()
+        {
+            return _extended;
+        }
+
+        /// <inheritdoc />
+        public override Task SetData(StatefulArgument data)
+        {
+            Argument = (SomeExtendedArg) data;
+            return Task.CompletedTask;
+        }
+    }
+
+    public class SomeExtendedArg : StatefulArgument
+    {
+        public string ExtendedString { get; set; } = new Random().Next().ToString();
+    }
+
+    public class SomeState : TestState, IChatStateWithData<StatefulArgument>
+    {
+        protected StatefulArgument Argument = new();
+
+        /// <inheritdoc />
+        public virtual StatefulArgument GetData()
+        {
+            return Argument;
+        }
+
+        /// <inheritdoc />
+        public virtual Task SetData(StatefulArgument data)
+        {
+            Argument = data;
+            return Task.CompletedTask;
+        }
+    }
+
+    public class StatefulState : TestState, IChatStateWithData<StatefulArgument>, IChatStateWithData<AnotherArgument>
     {
         private StatefulArgument _data = new();
+        private AnotherArgument _data2 = new();
 
-        public StatefulArgument GetData()
+        StatefulArgument IChatStateWithData<StatefulArgument>.GetData()
         {
             return _data;
+        }
+
+        /// <inheritdoc />
+        public Task SetData(AnotherArgument data)
+        {
+            _data2 = data;
+            return Task.CompletedTask;
         }
 
         public Task SetData(StatefulArgument data)
         {
             _data = data;
             return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        AnotherArgument IChatStateWithData<AnotherArgument>.GetData()
+        {
+            return _data2;
         }
     }
 }

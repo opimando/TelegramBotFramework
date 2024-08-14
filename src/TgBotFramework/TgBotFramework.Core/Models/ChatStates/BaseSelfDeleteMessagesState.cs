@@ -18,10 +18,6 @@ public abstract class BaseSelfDeleteMessagesState : BaseChatState, IChatStateWit
 {
     protected MessageToDeleteArgument Data = new();
 
-    public BaseSelfDeleteMessagesState(IEventBus eventsBus) : base(eventsBus)
-    {
-    }
-
     public virtual MessageToDeleteArgument GetData()
     {
         return Data;
@@ -33,9 +29,9 @@ public abstract class BaseSelfDeleteMessagesState : BaseChatState, IChatStateWit
         return Task.CompletedTask;
     }
 
-    protected override async Task OnStateExitInternal(IMessenger messenger, ChatId chatId)
+    protected override async Task OnStateExitInternal(ChatId chatId)
     {
         foreach (MessageId messageId in Data.MessagesIds)
-            await messenger.Delete(chatId, messageId);
+            await Messenger.Delete(chatId, messageId);
     }
 }

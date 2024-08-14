@@ -21,30 +21,27 @@ public interface IChatState
     /// Каждый новый экземпляр создаёт новый идентификатор
     /// </summary>
     Guid SessionId { get; set; }
-    
+
     /// <summary>
     /// Обработать полученное сообщение и вернуть новое состояние диалога
     /// </summary>
     /// <param name="receivedMessage">Сообщение из чата</param>
-    /// <param name="messenger">Мессенджер для ответа</param>
     /// <returns></returns>
-    Task<IChatState?> ProcessMessage(Message receivedMessage, IMessenger messenger);
+    Task<IChatState?> ProcessMessage(Message receivedMessage);
 
     /// <summary>
     /// Вызывается при инициализации состояния
     /// </summary>
-    /// <param name="messenger">Мессенджер для отправки сообщений</param>
     /// <param name="chatId">Идентификатор чата</param>
     /// <returns></returns>
-    Task OnStateStart(IMessenger messenger, ChatId chatId);
+    Task OnStateStart(ChatId chatId);
 
     /// <summary>
     /// Вызывается перед тем как состояние сменится на другое
     /// </summary>
-    /// <param name="messenger">Мессенджер для ответа</param>
     /// <param name="chatId">Идентификатор чата</param>
     /// <returns></returns>
-    Task OnStateExit(IMessenger messenger, ChatId chatId);
+    Task OnStateExit(ChatId chatId);
 
     /// <summary>
     /// Поведение при определении следующего состояния

@@ -18,6 +18,6 @@ namespace TgBotFramework.Core;
 /// </summary>
 public interface IChatStateFactory
 {
-    Task<T> CreateState<T>(StateArgument? argument = null) where T : IChatState;
-    Task<IChatState> CreateState(Type stateType, StateArgument? argument = null);
+    Task<T> CreateState<T>(params StateArgument?[] arguments) where T : IChatState;
+    Task<IChatState> CreateState(Type stateType, params StateArgument?[] arguments);
 }

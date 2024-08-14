@@ -14,15 +14,13 @@ namespace TgBotFramework.Core;
 public abstract class BaseStateStore : IChatStateStore
 {
     protected readonly IChatStateFactory StateFactory;
-    protected readonly IMessenger Messenger;
     protected readonly IEventBus EventsBus;
     protected List<TelegramStateInfo> SupportedStates = new();
 
-    public BaseStateStore(IChatStateFactory stateFactory, IEventBus eventsBus, IMessenger messenger)
+    public BaseStateStore(IChatStateFactory stateFactory, IEventBus eventsBus)
     {
         StateFactory = stateFactory;
         EventsBus = eventsBus;
-        Messenger = messenger;
     }
 
     #region Abstract methods
@@ -62,7 +60,7 @@ public abstract class BaseStateStore : IChatStateStore
         if (oldState != null)
             try
             {
-                await oldState.OnStateExit(Messenger, chatId);
+                await oldState.OnStateExit(chatId);
             }
             catch (Exception ex)
             {
@@ -73,7 +71,7 @@ public abstract class BaseStateStore : IChatStateStore
         if (newState != null)
             try
             {
-                await newState.OnStateStart(Messenger, chatId);
+                await newState.OnStateStart(chatId);
             }
             catch (Exception ex)
             {

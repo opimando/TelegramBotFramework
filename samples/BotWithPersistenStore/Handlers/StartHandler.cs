@@ -5,18 +5,14 @@ namespace BotWithPersistenStore.Handlers;
 [TelegramState("/start")]
 public class StartHandler : BaseChatState
 {
-    public StartHandler(IEventBus eventsBus) : base(eventsBus)
-    {
-    }
-
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
         var keyboardButtons = new KeyboardButtonGroup(new[]
         {
             new KeyboardButton("Имя 🧘")
         });
 
-        await messenger.Send(receivedMessage.ChatId, new SendInfo(new TextContent(
+        await Messenger.Send(receivedMessage.ChatId, new SendInfo(new TextContent(
             "Привет, пользователь :) " +
             "Для ознакомления предлагаю тебе в два этапа заполнить имя и фамилию." +
             "При этом после того как ты заполнишь имя, выключи приложение (контейнер бота) и затем включи его." +

@@ -11,14 +11,14 @@ public class SetNameHandler : BaseChatState
 {
     private readonly IChatStateFactory _stateFactory;
 
-    public SetNameHandler(IEventBus eventsBus, IChatStateFactory stateFactory) : base(eventsBus)
+    public SetNameHandler(IChatStateFactory stateFactory)
     {
         _stateFactory = stateFactory;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
-        MessageId messageId = await messenger.Send(receivedMessage.ChatId, "Введи своё имя");
+        MessageId messageId = await Messenger.Send(receivedMessage.ChatId, "Введи своё имя");
         var nextState = await _stateFactory.CreateState<WaitNameState>(
             new MessageToDeleteArgument
             {

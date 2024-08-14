@@ -24,8 +24,7 @@ public static class BotBuilderExtensions
                 var store = new PersistentChatStateStore(
                     sp.GetRequiredService<IStateRepository>(),
                     sp.GetRequiredService<IChatStateFactory>(),
-                    sp.GetRequiredService<IEventBus>(),
-                    sp.GetRequiredService<IMessenger>()
+                    sp.GetRequiredService<IEventBus>()
                 );
                 store.SetStates(config.GetRegisteredTypes());
                 return store;

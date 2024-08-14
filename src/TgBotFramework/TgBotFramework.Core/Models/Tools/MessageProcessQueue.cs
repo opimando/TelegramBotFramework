@@ -56,7 +56,15 @@ public class MessageProcessQueue : IMessageProcessQueue
                 return;
             }
 
-            await _messageProcessor.Process(message);
+            try
+            {
+                await _messageProcessor.Process(message);
+            }
+            finally
+            {
+                if (message.Content is IDisposable disposable) disposable.Dispose();
+            }
+
             if (queue.Count == 0) TryRemoveUser(chatId);
         }
         finally

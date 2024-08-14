@@ -31,8 +31,7 @@ public class BotBuilder
             sp =>
             {
                 IChatStateStore store = new InMemoryStateStore(sp.GetRequiredService<IChatStateFactory>(),
-                    sp.GetRequiredService<IEventBus>(),
-                    sp.GetRequiredService<IMessenger>());
+                    sp.GetRequiredService<IEventBus>());
                 store.SetStates(config.GetRegisteredTypes());
                 return store;
             });

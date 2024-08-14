@@ -5,11 +5,7 @@ namespace BasicBot.Handlers;
 [TelegramState("/start")]
 public class StartHandler : BaseChatState
 {
-    public StartHandler(IEventBus eventsBus) : base(eventsBus)
-    {
-    }
-
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
         var keyboardButtons = new KeyboardButtonGroup(new[]
         {
@@ -19,7 +15,7 @@ public class StartHandler : BaseChatState
             new KeyboardButton("Пол")
         });
 
-        await messenger.Send(
+        await Messenger.Send(
             receivedMessage.ChatId,
             new SendInfo(new TextContent("Привет, пользователь :)"))
             {

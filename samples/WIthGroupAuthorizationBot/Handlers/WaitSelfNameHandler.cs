@@ -5,17 +5,13 @@ namespace WithGroupAuthorizationBot.Handlers;
 [TelegramState("имя")]
 public class WaitSelfNameHandler : BaseSelfDeleteMessagesState
 {
-    public WaitSelfNameHandler(IEventBus eventsBus) : base(eventsBus)
-    {
-    }
-
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
         if (IsFirstStateInvoke) return this;
 
         if (receivedMessage.Content is not TextContent text)
         {
-            MessageId messageId = await messenger.Send(receivedMessage.ChatId, "Имя должно быть текстом");
+            MessageId messageId = await Messenger.Send(receivedMessage.ChatId, "Имя должно быть текстом");
             Data.Add(messageId);
             return this;
         }
@@ -23,20 +19,20 @@ public class WaitSelfNameHandler : BaseSelfDeleteMessagesState
         if (text.Content.Any(char.IsDigit)) //провалидируем, например, на наличие цифр
         {
             MessageId messageId =
-                await messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
+                await Messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
             Data.Add(messageId);
             return this;
         }
 
         MessageId successMessage =
-            await messenger.Send(receivedMessage.ChatId, $"Твоё имя сохранено, {text.Content}!");
+            await Messenger.Send(receivedMessage.ChatId, $"Твоё имя сохранено, {text.Content}!");
         //можно сохранить имя или передать его в следующий шаг
 
         return null;
     }
 
-    protected override async Task OnStateStartInternal(IMessenger messenger, ChatId chatId)
+    protected override async Task OnStateStartInternal(ChatId chatId)
     {
-        Data.Add(await messenger.Send(chatId, "Введи своё имя"));
+        Data.Add(await Messenger.Send(chatId, "Введи своё имя"));
     }
 }

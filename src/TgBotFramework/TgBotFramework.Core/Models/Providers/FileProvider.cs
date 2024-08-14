@@ -26,6 +26,8 @@ public class FileProvider : IFileProvider
     {
         MemoryStream stream = new();
         await _client.GetInfoAndDownloadFileAsync(fileId, stream);
+
+        stream.Seek(0, SeekOrigin.Begin);
         return stream;
     }
 }

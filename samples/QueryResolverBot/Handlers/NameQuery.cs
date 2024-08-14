@@ -7,12 +7,12 @@ public class NameQuery : BaseChatState
 {
     private readonly IQueryResolver _queryResolver;
 
-    public NameQuery(IEventBus eventsBus, IQueryResolver queryResolver) : base(eventsBus)
+    public NameQuery(IQueryResolver queryResolver)
     {
         _queryResolver = queryResolver;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage, IMessenger messenger)
+    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
     {
         if (receivedMessage.Content is not QueryMessageContent content) return this;
 

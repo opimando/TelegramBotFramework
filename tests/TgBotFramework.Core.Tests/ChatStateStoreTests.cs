@@ -23,8 +23,7 @@ public class ChatStateStoreTests
 
     public ChatStateStoreTests()
     {
-        _store = new InMemoryStateStore(new ChatStateFactory(_serviceProvider.Object), _eventsBus.Object,
-            Mock.Of<IMessenger>());
+        _store = new InMemoryStateStore(new ChatStateFactory(_serviceProvider.Object), _eventsBus.Object);
         _stateRegistry = new StateRegistry();
     }
 
@@ -133,19 +132,19 @@ public class ChatStateStoreTests
         public Guid SessionId { get; set; } = Guid.NewGuid();
         internal Action<ActionType>? OnAction { get; set; }
 
-        public Task<IChatState?> ProcessMessage(Message receivedMessage, IMessenger messenger)
+        public Task<IChatState?> ProcessMessage(Message receivedMessage)
         {
             OnAction?.Invoke(ActionType.Process);
             return Task.FromResult((IChatState) null);
         }
 
-        public Task OnStateStart(IMessenger messenger, ChatId chatId)
+        public Task OnStateStart(ChatId chatId)
         {
             OnAction?.Invoke(ActionType.Start);
             return Task.CompletedTask;
         }
 
-        public Task OnStateExit(IMessenger messenger, ChatId chatId)
+        public Task OnStateExit(ChatId chatId)
         {
             OnAction?.Invoke(ActionType.Exit);
             return Task.CompletedTask;
