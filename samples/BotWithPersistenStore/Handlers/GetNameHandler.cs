@@ -22,7 +22,7 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
         _stateFactory = stateFactory;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         Data.Add(receivedMessage.Id);
 
@@ -32,7 +32,7 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
             MessageId messageId =
                 await Messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
             Data.Add(messageId);
-            return this;
+            return new StateInfo(this);
         }
 
         string data = (receivedMessage.Content as TextContent)!.Content;
@@ -41,6 +41,6 @@ public class GetNameHandler : BaseSelfDeleteMessagesState
             new NameArgument {FirstName = data}
         );
 
-        return next;
+        return new StateInfo(next);
     }
 }

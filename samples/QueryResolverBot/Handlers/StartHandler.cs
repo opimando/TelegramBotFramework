@@ -5,9 +5,9 @@ namespace QueryResolverBot.Handlers;
 [TelegramState("/start")]
 public class StartHandler : BaseChatState
 {
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         await Messenger.Send(receivedMessage.ChatId, "Начни вводить своё имя");
-        return null;
+        return new StateInfo(null);
     }
 }

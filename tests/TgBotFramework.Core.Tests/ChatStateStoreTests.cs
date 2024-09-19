@@ -132,10 +132,10 @@ public class ChatStateStoreTests
         public Guid SessionId { get; set; } = Guid.NewGuid();
         internal Action<ActionType>? OnAction { get; set; }
 
-        public Task<IChatState?> ProcessMessage(Message receivedMessage)
+        public Task<IStateInfo> ProcessMessage(Message receivedMessage)
         {
             OnAction?.Invoke(ActionType.Process);
-            return Task.FromResult((IChatState) null);
+            return Task.FromResult((IStateInfo) new StateInfo(null));
         }
 
         public Task OnStateStart(ChatId chatId)

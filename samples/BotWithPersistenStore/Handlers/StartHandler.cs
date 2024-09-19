@@ -5,7 +5,7 @@ namespace BotWithPersistenStore.Handlers;
 [TelegramState("/start")]
 public class StartHandler : BaseChatState
 {
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         var keyboardButtons = new KeyboardButtonGroup(new[]
         {
@@ -21,6 +21,6 @@ public class StartHandler : BaseChatState
         {
             Buttons = keyboardButtons
         });
-        return null;
+        return new StateInfo(null);
     }
 }

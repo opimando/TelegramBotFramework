@@ -13,9 +13,9 @@ namespace TgBotFramework.Core;
 
 public class ExecuteProcessorWrapper : IMessageProcessMiddleware
 {
-    private readonly Func<Task<IChatState?>> _processMethod;
+    private readonly Func<Task<IStateInfo>> _processMethod;
 
-    public ExecuteProcessorWrapper(Func<Task<IChatState?>> processMethod)
+    public ExecuteProcessorWrapper(Func<Task<IStateInfo>> processMethod)
     {
         _processMethod = processMethod;
     }

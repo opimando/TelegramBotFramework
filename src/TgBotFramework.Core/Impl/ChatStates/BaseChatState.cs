@@ -22,7 +22,7 @@ public abstract class BaseChatState : IChatState
     public IMessenger Messenger { get; set; } = default!;
 
     public IEventBus EventsBus { get; set; } = default!;
-    
+
     public virtual StatePriority Priority => StatePriority.CanBeIgnored;
     public virtual Guid SessionId { get; set; } = Guid.NewGuid();
 
@@ -36,7 +36,7 @@ public abstract class BaseChatState : IChatState
 
     #region Abstract methods
 
-    protected abstract Task<IChatState?> InternalProcessMessage(Message receivedMessage);
+    protected abstract Task<IStateInfo> InternalProcessMessage(Message receivedMessage);
 
     #endregion Abstract methods
 
@@ -63,11 +63,13 @@ public abstract class BaseChatState : IChatState
 
     #endregion Protected methods
 
-    public virtual async Task<IChatState?> ProcessMessage(Message receivedMessage)
+    public virtual async Task<IStateInfo> ProcessMessage(Message receivedMessage)
     {
+        var baseRet = new StateInfo(this, ExecutionType.NextInvoke);
         try
         {
-            return await InternalProcessMessage(receivedMessage);
+            IStateInfo ret = await InternalProcessMessage(receivedMessage);
+            return ret;
         }
         catch (Exception ex)
         {
@@ -75,7 +77,7 @@ public abstract class BaseChatState : IChatState
             {
                 //ничего критичного, сообщение удаляется но ошибка всё равно вылетает :\
                 await PublishError(receivedMessage.ChatId, ex, "Ошибка при удалении");
-                return this;
+                return baseRet;
             }
 
             await PublishError(receivedMessage.ChatId, ex, string.Empty);
@@ -86,7 +88,7 @@ public abstract class BaseChatState : IChatState
             IsFirstStateInvoke = false;
         }
 
-        return this;
+        return baseRet;
     }
 
     public virtual async Task OnStateStart(ChatId chatId)

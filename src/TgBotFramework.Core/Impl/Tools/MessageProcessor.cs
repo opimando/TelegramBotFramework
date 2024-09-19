@@ -43,9 +43,11 @@ public class MessageProcessor : IMessageProcessor
                 return;
             }
 
-            IChatState? nextState = await ExecuteWithMiddlewares(message, handlerToProcess, currentState);
+            IStateInfo nextState = await ExecuteWithMiddlewares(message, handlerToProcess, currentState);
 
-            await _stateStore.SaveState(message.ChatId, nextState);
+            message.ProcessedTime = DateTime.Now;
+            await _stateStore.SaveState(message.ChatId, nextState.NextState);
+            await InvokeAgainIfStateInfo(nextState, message);
         }
         catch (Exception ex)
         {
@@ -53,27 +55,36 @@ public class MessageProcessor : IMessageProcessor
         }
     }
 
-    private async Task<IChatState?> ProcessInternal(Message message, IChatState executingState, IChatState? oldState)
+    private async Task InvokeAgainIfStateInfo(IStateInfo stateInfo, Message message)
+    {
+        if (stateInfo.NextState == null || stateInfo.ExecutionType == ExecutionType.NextInvoke)
+            return;
+
+        IStateInfo next = await ExecuteWithMiddlewares(message, stateInfo.NextState, stateInfo.NextState);
+        await _stateStore.SaveState(message.ChatId, next.NextState);
+    }
+
+    private async Task<IStateInfo> ProcessInternal(Message message, IChatState executingState, IChatState? oldState)
     {
         try
         {
             if (!executingState.Equals(oldState))
                 await _stateStore.NotifyReplacedStates(message.ChatId, oldState, executingState);
 
-            IChatState? nextState = await Process(executingState, message);
-            if (!executingState.Equals(nextState))
-                await _stateStore.NotifyReplacedStates(message.ChatId, executingState, nextState);
+            IStateInfo nextState = await Process(executingState, message);
+            if (!executingState.Equals(nextState.NextState))
+                await _stateStore.NotifyReplacedStates(message.ChatId, executingState, nextState.NextState);
 
             return nextState;
         }
         catch (Exception ex)
         {
             _eventsBus.Publish(new ErrorMessageProcessingEvent(ex, message));
-            return executingState;
+            return new StateInfo(executingState);
         }
     }
 
-    public async Task<IChatState?> ExecuteWithMiddlewares(Message message, IChatState? state, IChatState? oldState)
+    public async Task<IStateInfo> ExecuteWithMiddlewares(Message message, IChatState? state, IChatState? oldState)
     {
         IChatState? executingState = state ?? oldState;
 
@@ -88,7 +99,7 @@ public class MessageProcessor : IMessageProcessor
 
         var processorWrapper = new ExecuteProcessorWrapper(async () =>
         {
-            if (context.ExecutingState == null) return null;
+            if (context.ExecutingState == null) return new StateInfo(null);
 
             return await ProcessInternal(context.Message, context.ExecutingState, oldState);
         });
@@ -104,19 +115,19 @@ public class MessageProcessor : IMessageProcessor
         return context.Result;
     }
 
-    private async Task<IChatState?> Process(IChatState? state, Message message)
+    private async Task<IStateInfo> Process(IChatState? state, Message message)
     {
         try
         {
             if (state == null)
-                return null;
+                return new StateInfo(null);
 
             return await state.ProcessMessage(message);
         }
         catch (Exception ex)
         {
             _eventsBus.Publish(new ErrorMessageProcessingEvent(ex, message));
-            return state;
+            return new StateInfo(state);
         }
     }
 

@@ -12,9 +12,9 @@ public class NameQuery : BaseChatState
         _queryResolver = queryResolver;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
-        if (receivedMessage.Content is not QueryMessageContent content) return this;
+        if (receivedMessage.Content is not QueryMessageContent content) return new StateInfo(this);
 
         await _queryResolver.Response(content.MessageQueryId, new List<QueryMessageResponse>
         {
@@ -22,6 +22,6 @@ public class NameQuery : BaseChatState
             new TextQueryMessageResponse("Ответ2", "Полный ответ 2")
         }, Equals(receivedMessage.ChatId, receivedMessage.From.Id));
 
-        return this;
+        return new StateInfo(this);
     }
 }
