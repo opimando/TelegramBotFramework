@@ -55,7 +55,7 @@ public class TelegramBot : ITelegramBot
             messageMeta = (update.Message?.MessageId ?? update.Id).ToString() + update.Message?.Chat.Id;
             _eventBus.Publish(new ReceivedUpdateEvent(messageMeta));
 
-            Message? receivedMessage = update.GetMessage();
+            Message? receivedMessage = update.GetMessage(client);
 
             if (receivedMessage == null)
             {

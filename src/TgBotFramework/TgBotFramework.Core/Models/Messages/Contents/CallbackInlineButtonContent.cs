@@ -9,6 +9,8 @@
 
 #endregion Copyright
 
+using Telegram.Bot;
+
 namespace TgBotFramework.Core;
 
 /// <summary>
@@ -16,6 +18,8 @@ namespace TgBotFramework.Core;
 /// </summary>
 public class CallbackInlineButtonContent : IMessageContent
 {
+    internal ITelegramBotClient Client { get; init; }
+    
     public CallbackInlineButtonContent(string queryId, string? data)
     {
         QueryId = queryId;

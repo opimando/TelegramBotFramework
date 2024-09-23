@@ -9,6 +9,7 @@
 
 #endregion Copyright
 
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using OuterMessage = Telegram.Bot.Types.Message;
 using InnerMessage = TgBotFramework.Core.Message;
@@ -17,8 +18,10 @@ namespace TgBotFramework.Core;
 
 public static class MessageExtensions
 {
-    public static InnerMessage? GetMessage(this Update telegramMessage)
+    private static ITelegramBotClient _client;
+    public static InnerMessage? GetMessage(this Update telegramMessage, ITelegramBotClient client)
     {
+        _client ??= client;
         if (telegramMessage.InlineQuery != null) return telegramMessage.InlineQuery.GetQuery();
         if (telegramMessage.CallbackQuery != null) return telegramMessage.CallbackQuery.GetCallback();
         if (telegramMessage.Message != null) return telegramMessage.Message.GetMessage();
@@ -157,6 +160,6 @@ public static class MessageExtensions
 
     public static CallbackInlineButtonContent GetContent(this CallbackQuery query)
     {
-        return new CallbackInlineButtonContent(query.Id, query.Data);
+        return new CallbackInlineButtonContent(query.Id, query.Data) {Client = _client};
     }
 }
