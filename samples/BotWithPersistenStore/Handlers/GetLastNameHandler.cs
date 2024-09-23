@@ -15,13 +15,13 @@ namespace BotWithPersistenStore.Handlers;
 
 public class GetLastNameHandler : BaseChatState, IChatStateWithData<NameArgument>
 {
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         _argument.MessagesIds.Add(receivedMessage.Id);
         await Messenger.Send(receivedMessage.ChatId,
             $"Твоё имя: '{_argument.FirstName}', фамилия: '{(receivedMessage.Content as TextContent).Content}'");
 
-        return null;
+        return new StateInfo(null);
     }
 
     protected override async Task OnStateStartInternal(ChatId chatId)

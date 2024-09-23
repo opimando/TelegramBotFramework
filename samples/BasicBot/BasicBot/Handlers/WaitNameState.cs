@@ -4,7 +4,7 @@ namespace BasicBot.Handlers;
 
 public class WaitNameState : BaseSelfDeleteMessagesState
 {
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         Data.MessagesIds.Add(receivedMessage.Id);
 
@@ -12,7 +12,7 @@ public class WaitNameState : BaseSelfDeleteMessagesState
         {
             MessageId messageId = await Messenger.Send(receivedMessage.ChatId, "Имя должно быть текстом");
             Data.Add(messageId);
-            return this;
+            return new StateInfo(this);
         }
 
         if (text.Content.Any(char.IsDigit)) //провалидируем, например, на наличие цифр
@@ -20,10 +20,10 @@ public class WaitNameState : BaseSelfDeleteMessagesState
             MessageId messageId =
                 await Messenger.Send(receivedMessage.ChatId, "В имени не может быть цифр, введи заново!");
             Data.Add(messageId);
-            return this;
+            return new StateInfo(this);
         }
 
         await Messenger.Send(receivedMessage.ChatId, $"Твоё имя сохранено, {text.Content}!");
-        return this;
+        return new StateInfo(this);
     }
 }

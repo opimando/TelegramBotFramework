@@ -25,19 +25,19 @@ public class ChooseSexHandler : BaseChatState
         });
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
-        if (IsFirstStateInvoke) return this;
+        if (IsFirstStateInvoke) return new StateInfo(this);
 
         if (receivedMessage.Content is not CallbackInlineButtonContent content)
         {
             await Messenger.Send(receivedMessage.ChatId, "Выбери пол :(");
-            return this;
+            return new StateInfo(this);
         }
 
         string choosed = content.Data == "male" ? "мужской" :
             content.Data == "female" ? "женский" : "это что за пол такой?";
         await Messenger.Send(receivedMessage.ChatId, $"Ты выбрал {choosed}");
-        return null;
+        return new StateInfo(null);
     }
 }

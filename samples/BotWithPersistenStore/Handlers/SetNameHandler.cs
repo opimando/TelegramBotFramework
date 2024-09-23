@@ -23,7 +23,7 @@ public class SetNameHandler : BaseChatState
         _stateFactory = stateFactory;
     }
 
-    protected override async Task<IChatState?> InternalProcessMessage(Message receivedMessage)
+    protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
         MessageId messageId = await Messenger.Send(receivedMessage.ChatId, "Введи своё имя");
         var nextState = await _stateFactory.CreateState<GetNameHandler>(
@@ -36,6 +36,6 @@ public class SetNameHandler : BaseChatState
                 }
             }
         );
-        return nextState;
+        return new StateInfo(nextState);
     }
 }

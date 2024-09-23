@@ -27,7 +27,7 @@ public interface IChatState
     /// </summary>
     /// <param name="receivedMessage">Сообщение из чата</param>
     /// <returns></returns>
-    Task<IChatState?> ProcessMessage(Message receivedMessage);
+    Task<IStateInfo> ProcessMessage(Message receivedMessage);
 
     /// <summary>
     /// Вызывается при инициализации состояния

@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\TgBotFramework.Core\TgBotFramework.Core.csproj" />
       <ProjectReference Include="..\..\src\TgBotFramework\TgBotFramework.Core\TgBotFramework.Core.csproj" />
     </ItemGroup>
 

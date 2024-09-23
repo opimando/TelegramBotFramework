@@ -37,6 +37,7 @@ public class Message
     public Message? ReplyTo { get; }
     public User? ForwardedFrom { get; }
     public DateTime Created { get; } = DateTime.Now;
+    public DateTime? ProcessedTime { get; set; }
 
     public override string ToString()
     {

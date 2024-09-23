@@ -15,5 +15,5 @@ public class MessageExecutionContext
 {
     public Message Message { get; set; }
     public IChatState? ExecutingState { get; set; }
-    public IChatState? Result { get; set; }
+    public IStateInfo Result { get; set; }
 }
