@@ -1,0 +1,4 @@
+{
+  "TgApiKey": "key",
+  "DbString": "Server=postgre;port=5432;Database=bot;User Id=postgres;Password=123456"
+}

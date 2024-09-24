@@ -19,7 +19,7 @@ public class GetLastNameHandler : BaseChatState, IChatStateWithData<NameArgument
     {
         _argument.MessagesIds.Add(receivedMessage.Id);
         await Messenger.Send(receivedMessage.ChatId,
-            $"Твоё имя: '{_argument.FirstName}', фамилия: '{(receivedMessage.Content as TextContent).Content}'");
+            $"Твоё имя: '{_argument.FirstName}', фамилия: '{(receivedMessage.Content as TextContent)!.Content}'");
 
         return new StateInfo(null);
     }
@@ -54,5 +54,5 @@ public class GetLastNameHandler : BaseChatState, IChatStateWithData<NameArgument
 
 public class NameArgument : MessageToDeleteArgument
 {
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
 }

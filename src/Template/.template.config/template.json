@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "opimando",
+  "classifications": ["Tg", "Bot", "Console"],
+  "identity": "TgBot.Startup",
+  "name": "TgBotConsole",
+  "shortName": "tg-bot-console",
+  "defaultName": "TgBot.Startup",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "WithPersistent": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true"
+    }
+  },
+  "sourceName": "TgBot.Startup",
+  "preferNameDirectory": true
+}
