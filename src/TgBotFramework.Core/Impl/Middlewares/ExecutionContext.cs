@@ -13,6 +13,12 @@ namespace TgBotFramework.Core;
 
 public class MessageExecutionContext
 {
+    public MessageExecutionContext(Message message)
+    {
+        Message = message;
+        Result = new StateInfo(null);
+    }
+
     public Message Message { get; set; }
     public IChatState? ExecutingState { get; set; }
     public IStateInfo Result { get; set; }

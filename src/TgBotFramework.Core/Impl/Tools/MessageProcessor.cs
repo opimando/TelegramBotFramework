@@ -91,11 +91,7 @@ public class MessageProcessor : IMessageProcessor
         if (executingState == null) throw new ArgumentException("Не определён обработчик сообщения");
         if (!_middlewares.Any()) return await ProcessInternal(message, executingState, oldState);
 
-        var context = new MessageExecutionContext
-        {
-            Message = message,
-            ExecutingState = executingState
-        };
+        var context = new MessageExecutionContext(message) {ExecutingState = executingState};
 
         var processorWrapper = new ExecuteProcessorWrapper(async () =>
         {
