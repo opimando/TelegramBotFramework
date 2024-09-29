@@ -18,7 +18,7 @@ namespace TgBotFramework.Core;
 /// </summary>
 public class CallbackInlineButtonContent : IMessageContent
 {
-    internal ITelegramBotClient Client { get; init; }
+    internal ITelegramBotClient? Client { get; init; }
     
     public CallbackInlineButtonContent(string queryId, string? data)
     {

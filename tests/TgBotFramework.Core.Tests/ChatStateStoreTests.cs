@@ -60,7 +60,7 @@ public class ChatStateStoreTests
     [Fact]
     public async Task GetNewHandlerForRequest_EmptyMessage_ShouldThrowArgumentException()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _store.GetNewHandlerForRequest(default));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _store.GetNewHandlerForRequest(It.IsAny<Message>()));
     }
 
     [Fact]

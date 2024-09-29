@@ -18,7 +18,7 @@ namespace TgBotFramework.Core;
 
 public static class MessageExtensions
 {
-    private static ITelegramBotClient _client;
+    private static ITelegramBotClient? _client;
     public static InnerMessage? GetMessage(this Update telegramMessage, ITelegramBotClient client)
     {
         _client ??= client;

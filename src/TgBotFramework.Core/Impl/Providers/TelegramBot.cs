@@ -78,7 +78,8 @@ public class TelegramBot : ITelegramBot
         catch (Exception ex)
         {
             if (update?.Message?.Chat?.Id != default)
-                await client.SendTextMessageAsync(update.Message.Chat.Id, ex.Message, cancellationToken: cancel);
+                await client.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(update.Message.Chat.Id), ex.Message,
+                    cancellationToken: cancel);
 
             _eventBus.Publish(new ErrorEvent(ex, "Ошибка при обработке нового сообщения: " + messageMeta));
         }
