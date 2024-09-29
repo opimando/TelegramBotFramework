@@ -41,14 +41,13 @@ public static class ChatStateWithDataExtensions
         if (state == null) return Array.Empty<StateArgument?>();
         if (!state.IsDataState()) return Array.Empty<StateArgument?>();
 
-        List<MethodInfo> methodInfo = state.GetType().GetMethods()
-            .Where(m =>
-                m.Name == "GetData"
-                && m.ReturnParameter.ParameterType.IsAssignableTo(typeof(StateArgument))
-            )
-            .ToList();
+        List<MethodInfo> methodsInfo = GetInterfacesMethods(state.GetType())
+            .Where(s => s.Name == "GetData").ToList();
 
-        IEnumerable<StateArgument?> args = methodInfo.Select(s => (StateArgument?) s.Invoke(state, null));
+        IEnumerable<StateArgument?> args = methodsInfo
+            .Select(s =>
+                (StateArgument?) s.Invoke(state, null)
+            );
 
         return args.ToArray();
     }
@@ -63,7 +62,8 @@ public static class ChatStateWithDataExtensions
     {
         if (state == null) return Task.CompletedTask;
 
-        List<MethodInfo> methodsInfo = GetInterfacesMethods(state.GetType());
+        List<MethodInfo> methodsInfo = GetInterfacesMethods(state.GetType())
+            .Where(s => s.Name == "SetData").ToList();
 
         List<(StateArgument? Argument, MethodInfo? Method)> argumentWithMethods = arguments
             .Where(s => s != null)
@@ -94,7 +94,8 @@ public static class ChatStateWithDataExtensions
                 if (implemented.IsGenericType && implemented.GetGenericTypeDefinition() == dataInterface)
                 {
                     InterfaceMapping map = stateType.GetInterfaceMap(implemented);
-                    IEnumerable<MethodInfo> methods = map.InterfaceMethods.Where(m => m.Name == "SetData");
+                    IEnumerable<MethodInfo> methods =
+                        map.InterfaceMethods.Where(m => m.Name is "SetData" or "GetData");
                     ret.AddRange(methods);
                 }
         }
