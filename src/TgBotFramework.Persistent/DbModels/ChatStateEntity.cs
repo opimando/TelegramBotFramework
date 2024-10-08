@@ -17,7 +17,7 @@ namespace TgBotFramework.Persistent;
 [Index(nameof(ChatId))]
 public class ChatStateEntity
 {
-    [Key] public string ChatId { get; set; }
+    [Key] public string ChatId { get; set; } = string.Empty;
     public Guid? SessionId { get; set; }
     public Type? Type { get; set; }
     public object? Argument { get; set; }

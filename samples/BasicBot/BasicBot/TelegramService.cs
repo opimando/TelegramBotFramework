@@ -14,7 +14,7 @@ public class TelegramService : IHostedService
         _eventsBus = eventsBus;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         _eventsBus.Subscribe<BaseEvent>(evt =>
         {
@@ -26,6 +26,7 @@ public class TelegramService : IHostedService
             Console.WriteLine($"[{DateTime.Now:dd-MM-yyyy HH:mm:ss}]: {evt}");
         });
         _bot.Start();
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

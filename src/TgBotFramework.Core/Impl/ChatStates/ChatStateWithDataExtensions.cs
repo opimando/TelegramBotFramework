@@ -41,14 +41,13 @@ public static class ChatStateWithDataExtensions
         if (state == null) return Array.Empty<StateArgument?>();
         if (!state.IsDataState()) return Array.Empty<StateArgument?>();
 
-        var methodInfo = state.GetType().GetMethods()
-            .Where(m =>
-                m.Name == "GetData"
-                && m.ReturnParameter.ParameterType.IsAssignableTo(typeof(StateArgument))
-            )
-            .ToList();
+        List<MethodInfo> methodsInfo = GetInterfacesMethods(state.GetType())
+            .Where(s => s.Name == "GetData").ToList();
 
-        var args = methodInfo.Select(s => (StateArgument?) s.Invoke(state, null));
+        IEnumerable<StateArgument?> args = methodsInfo
+            .Select(s =>
+                (StateArgument?) s.Invoke(state, null)
+            );
 
         return args.ToArray();
     }
@@ -63,36 +62,40 @@ public static class ChatStateWithDataExtensions
     {
         if (state == null) return Task.CompletedTask;
 
-        var methodsInfo = GetInterfacesMethods(state.GetType());
+        List<MethodInfo> methodsInfo = GetInterfacesMethods(state.GetType())
+            .Where(s => s.Name == "SetData").ToList();
 
-        List<(StateArgument? Argument, MethodInfo? Method)> argumentWithMethods = arguments.Select(a =>
-        {
-            MethodInfo method = methodsInfo.FirstOrDefault(m =>
-                a.GetType().IsAssignableTo(m.GetParameters()[0].ParameterType)
-            );
-            return (a, method);
-        }).ToList();
+        List<(StateArgument? Argument, MethodInfo? Method)> argumentWithMethods = arguments
+            .Where(s => s != null)
+            .Select(a =>
+            {
+                MethodInfo? method = methodsInfo.FirstOrDefault(m =>
+                    a!.GetType().IsAssignableTo(m.GetParameters()[0].ParameterType)
+                );
+                return (a, method);
+            }).ToList();
 
-        var tasks = argumentWithMethods
+        IEnumerable<Task> tasks = argumentWithMethods
             .Where(s => s.Method != null && s.Argument != null)
-            .Select(p => Task.Run(() => { p.Method.Invoke(state, new object?[] {p.Argument}); }));
+            .Select(p => Task.Run(() => { p.Method!.Invoke(state, new object?[] {p.Argument}); }));
         return Task.WhenAll(tasks);
     }
 
     private static List<MethodInfo> GetInterfacesMethods(Type stateType)
     {
-        var ret = new List<MethodInfo>();
+        List<MethodInfo> ret = new();
         try
         {
             Type dataInterface = typeof(IChatStateWithData<>);
 
-            var implementedInterfaces = stateType.GetInterfaces();
+            Type[] implementedInterfaces = stateType.GetInterfaces();
 
             foreach (Type implemented in implementedInterfaces)
                 if (implemented.IsGenericType && implemented.GetGenericTypeDefinition() == dataInterface)
                 {
                     InterfaceMapping map = stateType.GetInterfaceMap(implemented);
-                    var methods = map.InterfaceMethods.Where(m => m.Name == "SetData");
+                    IEnumerable<MethodInfo> methods =
+                        map.InterfaceMethods.Where(m => m.Name is "SetData" or "GetData");
                     ret.AddRange(methods);
                 }
         }
