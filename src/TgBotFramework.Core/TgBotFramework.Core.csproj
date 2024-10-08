@@ -8,7 +8,7 @@
     
     <PropertyGroup>
         <PackageId>TgBotFramework.Core</PackageId>
-        <Version>0.1.19</Version>
+        <Version>0.1.20</Version>
         <Authors>Denis Osipenko</Authors>
         <Description>Framework for creating bots with persistent state storage and authorization capabilities</Description>
         <PackageTags>Telegram;Bot</PackageTags>

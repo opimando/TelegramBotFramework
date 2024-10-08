@@ -1,5 +1,5 @@
 # TelegramBotFramework
-[![package](https://img.shields.io/badge/TgBotFramework.Core-v0.1.17-blue
+[![package](https://img.shields.io/badge/TgBotFramework.Core-v0.1.20-blue
 )](https://www.nuget.org/packages/TgBotFramework.Core/)
 
 Framework for creating bots with persistent state storage and authorization capabilities
