@@ -18,7 +18,8 @@ namespace TgBotFramework.Core;
 
 public static class MessageExtensions
 {
-    private static ITelegramBotClient _client;
+    private static ITelegramBotClient? _client;
+
     public static InnerMessage? GetMessage(this Update telegramMessage, ITelegramBotClient client)
     {
         _client ??= client;
@@ -44,7 +45,8 @@ public static class MessageExtensions
                 message.Audio.FileName,
                 message.Audio.FileUniqueId,
                 message.Audio.Duration,
-                message.Audio.Title
+                message.Audio.Title,
+                message.Caption
             );
         }
         else if (message.Contact != null)
@@ -57,7 +59,7 @@ public static class MessageExtensions
         else if (message.Document != null)
         {
             content = new DocumentContent(message.Document.FileId, message.Document.FileUniqueId,
-                message.Document.FileName, message.Document.FileSize);
+                message.Document.FileName, message.Document.FileSize, message.Caption);
         }
         else if (message.Location != null)
         {
@@ -79,7 +81,8 @@ public static class MessageExtensions
             ImageContent? preview = message.Video.Thumbnail == null
                 ? null
                 : new ImageContent(message.Video.Thumbnail.FileId, message.Video.Thumbnail.FileUniqueId,
-                    message.Video.Thumbnail.FileSize, message.Video.Thumbnail.Width, message.Video.Thumbnail.Height);
+                    message.Video.Thumbnail.FileSize, message.Video.Thumbnail.Width, message.Video.Thumbnail.Height,
+                    message.Caption);
             content = new VideoContent(message.Video.FileId, message.Video.FileUniqueId, message.Video.FileSize,
                 message.Video.Width, message.Video.Height, message.Video.Duration, preview);
         }
@@ -88,7 +91,7 @@ public static class MessageExtensions
             PhotoSize theBiggestPhoto = message.Photo.MaxBy(s => s.FileSize ?? s.Width)!;
 
             content = new ImageContent(theBiggestPhoto.FileId, theBiggestPhoto.FileUniqueId,
-                theBiggestPhoto.FileSize, theBiggestPhoto.Width, theBiggestPhoto.Height);
+                theBiggestPhoto.FileSize, theBiggestPhoto.Width, theBiggestPhoto.Height, message.Caption);
         }
         else if (message.Voice != null)
         {
