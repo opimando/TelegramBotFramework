@@ -51,9 +51,9 @@ public class ChatStateFactory : IChatStateFactory
         if (state == null) return;
 
         Type type = state.GetType();
-        List<PropertyInfo> props = type.GetProperties()
+        var props = type.GetProperties()
             .Where(s =>
-                (s.PropertyType == typeof(IMessenger) || s.PropertyType == typeof(IEventBus))
+                _defaultServicesTypes.Contains(s.PropertyType)
                 && s.SetMethod != null
             )
             .ToList();
@@ -68,4 +68,9 @@ public class ChatStateFactory : IChatStateFactory
             prop.SetValue(state, service);
         }
     }
+
+    private readonly List<Type> _defaultServicesTypes = new()
+    {
+        typeof(IMessenger), typeof(IEventBus), typeof(ExceptionPolicy)
+    };
 }

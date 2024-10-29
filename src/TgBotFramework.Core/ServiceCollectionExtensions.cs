@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
             _ => new TelegramBotClient(apiKey) {Timeout = TimeSpan.FromMinutes(1)}
         );
 
+        serviceCollection.AddSingleton(config.Exceptions);
         serviceCollection.AddTransient<IMessenger, Messenger>();
         serviceCollection.AddSingleton<TelegramBot>();
 

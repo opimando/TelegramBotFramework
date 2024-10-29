@@ -17,6 +17,11 @@ await new HostBuilder()
         if (settings == null)
             throw new ArgumentNullException(nameof(settings), "Не удалось получить настройки приложения");
 
-        services.InitializeBot(settings.ApiKey, builder => { builder.WithStates(Assembly.GetExecutingAssembly()); });
+        services.InitializeBot(settings.ApiKey, builder =>
+        {
+            builder.WithStates(Assembly.GetExecutingAssembly());
+            builder.Exceptions.ExceptionHandler =
+                exception => $"Пользовательское сообщение о наличии ошибки: {exception.Message}";
+        });
         services.AddHostedService<TelegramService>();
     }).Build().RunAsync();

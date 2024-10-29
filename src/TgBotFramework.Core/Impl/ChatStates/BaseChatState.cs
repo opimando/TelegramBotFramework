@@ -23,6 +23,8 @@ public abstract class BaseChatState : IChatState
 
     public IEventBus EventsBus { get; set; } = default!;
 
+    public ExceptionPolicy? ExceptionPolicy { get; set; }
+
     public virtual StatePriority Priority => StatePriority.CanBeIgnored;
     public virtual Guid SessionId { get; set; } = Guid.NewGuid();
 
@@ -50,22 +52,51 @@ public abstract class BaseChatState : IChatState
         return Task.CompletedTask;
     }
 
-    protected virtual Task PublishError(ChatId processingChatId, Exception ex, string? message)
+    protected virtual async Task PublishError(ChatId processingChatId, Exception ex, string? message)
     {
         EventsBus.Publish(new InStateHandlerError(ex, message ?? string.Empty, this, processingChatId));
-        return Task.CompletedTask;
+        await SendError(processingChatId, ex);
+        if (ExceptionPolicy?.CustomActionOnError != null)
+        {
+            try
+            {
+                ExceptionPolicy.CustomActionOnError.Invoke(Messenger, processingChatId, ex);
+            }
+            catch (Exception ex2)
+            {
+                EventsBus.Publish(new ErrorEvent(ex2, "Ошибка при выполнении доп действия на исключение"));
+            }
+        }
     }
 
-    protected virtual async Task SendError(ChatId chatId, string message)
+    protected virtual async Task SendError(ChatId chatId, Exception exception)
     {
-        await Messenger.Send(chatId, new SendInfo(new TextContent(message)));
+        if (ExceptionPolicy == null)
+            return;
+
+        if (!ExceptionPolicy.SendToUser)
+            return;
+
+        try
+        {
+            string message = ExceptionPolicy.ExceptionHandler == null
+                ? exception.Message
+                : ExceptionPolicy.ExceptionHandler(exception);
+
+            if (!string.IsNullOrWhiteSpace(message))
+                await Messenger.Send(chatId, new SendInfo(new TextContent(message)));
+        }
+        catch (Exception ex)
+        {
+            EventsBus.Publish(new ErrorEvent(ex, "Ошибка при отправке исключения"));
+        }
     }
 
     #endregion Protected methods
 
     public virtual async Task<IStateInfo> ProcessMessage(Message receivedMessage)
     {
-        var baseRet = new StateInfo(this, ExecutionType.NextInvoke);
+        var baseRet = new StateInfo(this);
         try
         {
             IStateInfo ret = await InternalProcessMessage(receivedMessage);
@@ -81,7 +112,6 @@ public abstract class BaseChatState : IChatState
             }
 
             await PublishError(receivedMessage.ChatId, ex, string.Empty);
-            await SendError(receivedMessage.ChatId, ex.Message);
         }
         finally
         {

@@ -20,14 +20,16 @@ public class TelegramBot : ITelegramBot
     private readonly IEventBus _eventBus;
     private readonly IMessageProcessQueue _messageQueue;
     private readonly IAuthProvider? _authProvider;
+    private readonly ExceptionPolicy? _exceptionPolicy;
 
     public TelegramBot(ITelegramBotClient client, IEventBus eventBus, IMessageProcessQueue messageQueue,
-        IAuthProvider? authProvider = null)
+        IAuthProvider? authProvider = null, ExceptionPolicy? exceptionPolicy = null)
     {
         _client = client;
         _eventBus = eventBus;
         _messageQueue = messageQueue;
         _authProvider = authProvider;
+        _exceptionPolicy = exceptionPolicy;
     }
 
     public void Start()
@@ -77,23 +79,41 @@ public class TelegramBot : ITelegramBot
         }
         catch (Exception ex)
         {
-            if (update?.Message?.Chat?.Id != default)
-                await client.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(update.Message.Chat.Id), ex.Message,
-                    cancellationToken: cancel);
-
+            if (update?.Message?.Chat?.Id != default && _exceptionPolicy != null)
+            {
+                if (_exceptionPolicy.SendToUser)
+                {
+                    try
+                    {
+                        string message = _exceptionPolicy.ExceptionHandler == null
+                            ? ex.Message
+                            : _exceptionPolicy.ExceptionHandler(ex);
+                        
+                        if (!string.IsNullOrWhiteSpace(message))
+                            await client.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(update.Message.Chat.Id), message,
+                                cancellationToken: cancel);
+                    }
+                    catch (Exception ex2)
+                    {
+                        _eventBus.Publish(new ErrorEvent(ex, "Ошибка при отправке исключения: " + ex2.Message));
+                    }
+                }
+            }
+              
             _eventBus.Publish(new ErrorEvent(ex, "Ошибка при обработке нового сообщения: " + messageMeta));
         }
     }
 
     public async Task SetCommands(IEnumerable<CommandButton> buttons)
     {
-        BotCommand[] tgCommands = buttons
+        var buttonsList = buttons.ToList();
+        var tgCommands = buttonsList
             .Select(s => s.ToCommandButton())
             .Where(s => s != null)
             .Select(s => s!).ToArray();
 
         await _client.SetMyCommandsAsync(tgCommands);
-        _eventBus.Publish(new SetBotCommandsEvent(buttons.ToList()));
+        _eventBus.Publish(new SetBotCommandsEvent(buttonsList));
     }
 
     public async Task SetDescription(string description)

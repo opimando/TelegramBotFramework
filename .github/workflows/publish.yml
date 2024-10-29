@@ -1,0 +1,36 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build project
+      run: dotnet build --configuration Release
+
+    - name: Pack Package 1
+      run: |
+        dotnet pack ./src/TgBotFramework.Core/TgBotFramework.Core.csproj --configuration Release --output ./artifacts
+
+    - name: Pack Package 2
+      run: |
+        dotnet pack ./src/TgBotFramework.Persistent/TgBotFramework.Persistent.csproj --configuration Release --output ./artifacts
+
+    - name: Publish Packages
+      run: |
+        dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

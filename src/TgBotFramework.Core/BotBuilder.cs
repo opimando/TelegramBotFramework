@@ -21,6 +21,8 @@ public class BotBuilder
 
     public List<Action<IServiceCollection, BotBuilder>> MiddlewaresRegistrationFunctions { get; } = new();
 
+    public ExceptionPolicy Exceptions { get; set; } = new(); 
+
     public virtual Action<IServiceCollection, BotBuilder> SpamFilterRegistrationFunction { get; set; } =
         (serviceCollection, builder) => { };
 
