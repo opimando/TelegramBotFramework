@@ -24,6 +24,7 @@ public abstract class BaseFileContent : IMessageContent, IDisposable
     {
         Data = new MemoryStream();
         fileData.CopyTo(Data);
+        Data.Seek(0, SeekOrigin.Begin);
         FileName = fileName;
     }
 
