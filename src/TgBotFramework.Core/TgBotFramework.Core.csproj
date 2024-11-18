@@ -8,7 +8,7 @@
     
     <PropertyGroup>
         <PackageId>TgBotFramework.Core</PackageId>
-        <Version>0.2.2</Version>
+        <Version>0.2.3</Version>
         <Authors>Denis Osipenko</Authors>
         <Description>Framework for creating bots with persistent state storage and authorization capabilities</Description>
         <PackageTags>Telegram;Bot</PackageTags>
@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-      <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+      <PackageReference Include="Telegram.Bot" Version="22.0.2" />
     </ItemGroup>
 
     <ItemGroup>

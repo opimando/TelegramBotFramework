@@ -39,6 +39,7 @@ public class Messenger : IMessenger
 
         MessageId messageId = sendMessageInfo.Content switch
         {
+            ChatActionContent action => await action.Send(Client, chatId),
             TextContent text => await text.Send(Client, chatId, sendMessageInfo, markup, replyTo),
             ImageGroupContent group => await group.Send(Client, chatId, sendMessageInfo, replyTo),
             LocationContent location => await location.Send(Client, chatId, sendMessageInfo, markup, replyTo),
@@ -99,7 +100,7 @@ public class Messenger : IMessenger
         InlineKeyboardMarkup? markup)
     {
         string newText = text.Content.GetMessageText();
-        await Client.EditMessageTextAsync(
+        await Client.EditMessageText(
             chatId.Id,
             messageToEditId,
             newText,
@@ -112,7 +113,7 @@ public class Messenger : IMessenger
     {
         try
         {
-            await Client.DeleteMessageAsync(chatId.Id, messageId);
+            await Client.DeleteMessage(chatId.Id, messageId);
             _eventBus.Publish(new MessageDeletedEvent(messageId));
         }
         catch (Exception ex)

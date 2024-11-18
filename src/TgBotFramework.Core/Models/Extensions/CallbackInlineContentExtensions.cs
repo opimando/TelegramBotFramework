@@ -6,6 +6,6 @@ public static class CallbackInlineContentExtensions
 {
     public static Task Answer(this CallbackInlineButtonContent callback, string? text = null, bool? showAlert = null)
     {
-        return callback?.Client?.AnswerCallbackQueryAsync(callback.QueryId, text, showAlert) ?? Task.CompletedTask;
+        return callback?.Client?.AnswerCallbackQuery(callback.QueryId, text, showAlert ?? false) ?? Task.CompletedTask;
     }
 }

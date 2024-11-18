@@ -12,6 +12,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using TgAction = Telegram.Bot.Types.Enums.ChatAction;
 
 namespace TgBotFramework.Core;
 
@@ -33,7 +34,7 @@ internal static class ContentExtensions
             VideoNoteContent note => await note.Send(client, chatId, sendInfo, markup, replyTo),
             VideoContent video => await video.Send(client, chatId, sendInfo, markup, replyTo),
             ImageContent image => await image.Send(client, chatId, sendInfo, markup, replyTo),
-            _ => throw new ArgumentOutOfRangeException("Не поддерживаемый тип контента")
+            _ => throw new ArgumentOutOfRangeException(nameof(content), "Не поддерживаемый тип контента")
         };
     }
 
@@ -45,13 +46,13 @@ internal static class ContentExtensions
         IReplyMarkup? markup,
         MessageId? replyTo)
     {
-        Telegram.Bot.Types.Message ret = await client.SendAudioAsync(
+        Telegram.Bot.Types.Message ret = await client.SendAudio(
             chatId.Id,
             content.Data == null
                 ? InputFile.FromFileId(content.FileId)
                 : InputFile.FromStream(content.Data, content.FileName),
-            caption: content.Caption,
-            replyToMessageId: replyTo?.Id,
+            content.Caption,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -68,13 +69,13 @@ internal static class ContentExtensions
         IReplyMarkup? markup,
         MessageId? replyTo)
     {
-        Telegram.Bot.Types.Message ret = await client.SendDocumentAsync(
+        Telegram.Bot.Types.Message ret = await client.SendDocument(
             chatId.Id,
             content.Data == null
                 ? InputFile.FromFileId(content.FileId)
                 : InputFile.FromStream(content.Data, content.FileName),
-            caption: content.Caption,
-            replyToMessageId: replyTo?.Id,
+            content.Caption,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -102,11 +103,11 @@ internal static class ContentExtensions
             data = InputFile.FromStream(content.Data, content.FileName);
         }
 
-        Telegram.Bot.Types.Message ret = await client.SendPhotoAsync(
+        Telegram.Bot.Types.Message ret = await client.SendPhoto(
             chatId.Id,
             data,
-            caption: content.Caption,
-            replyToMessageId: replyTo?.Id,
+            content.Caption,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -123,12 +124,12 @@ internal static class ContentExtensions
         IReplyMarkup? markup,
         MessageId? replyTo)
     {
-        Telegram.Bot.Types.Message ret = await client.SendContactAsync(
+        Telegram.Bot.Types.Message ret = await client.SendContact(
             chatId.Id,
             content.PhoneNumber,
             content.FirstName,
-            lastName: content.LastName,
-            replyToMessageId: replyTo?.Id,
+            content.LastName,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected()
@@ -167,11 +168,11 @@ internal static class ContentExtensions
             photos.Add(photo);
         }
 
-        Telegram.Bot.Types.Message[] ret = await client.SendMediaGroupAsync(chatId.Id,
+        var ret = await client.SendMediaGroup(chatId.Id,
             photos,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
-            replyToMessageId: replyTo?.Id
+            replyParameters: replyTo?.Id
         );
         return ret.First().MessageId;
     }
@@ -188,17 +189,41 @@ internal static class ContentExtensions
         if (content.WillBeOnline != TimeSpan.Zero)
             livePeriod = (int) content.WillBeOnline.TotalSeconds;
 
-        Telegram.Bot.Types.Message ret = await client.SendLocationAsync(
+        Telegram.Bot.Types.Message ret = await client.SendLocation(
             chatId.Id,
             content.Latitude,
             content.Longitude,
-            replyToMessageId: replyTo?.Id,
-            replyMarkup: markup,
+            replyTo?.Id,
+            markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
             livePeriod: livePeriod
         );
         return ret.MessageId;
+    }
+
+    public static async Task<MessageId> Send(this ChatActionContent content, ITelegramBotClient client, ChatId chatId)
+    {
+        TgAction tgAction = content.Action switch
+        {
+            ChatAction.UploadPhoto => TgAction.UploadPhoto,
+            ChatAction.RecordVideo => TgAction.UploadPhoto,
+            ChatAction.UploadVideo => TgAction.UploadPhoto,
+            ChatAction.RecordVoice => TgAction.UploadPhoto,
+            ChatAction.UploadVoice => TgAction.UploadPhoto,
+            ChatAction.UploadDocument => TgAction.UploadPhoto,
+            ChatAction.FindLocation => TgAction.UploadPhoto,
+            ChatAction.RecordVideoNote => TgAction.UploadPhoto,
+            ChatAction.UploadVideoNote => TgAction.UploadPhoto,
+            ChatAction.ChooseSticker => TgAction.ChooseSticker,
+            _ => TgAction.Typing
+        };
+
+        await client.SendChatAction(
+            chatId.Id,
+            tgAction
+        );
+        return MessageId.NotExistId;
     }
 
     public static async Task<MessageId> Send(this TextContent content,
@@ -210,10 +235,10 @@ internal static class ContentExtensions
     )
     {
         string messageText = GetMessageText(content.Content);
-        Telegram.Bot.Types.Message ret = await client.SendTextMessageAsync(
+        Telegram.Bot.Types.Message ret = await client.SendMessage(
             chatId.Id,
             messageText,
-            replyToMessageId: replyTo?.Id,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -236,10 +261,10 @@ internal static class ContentExtensions
         else
             file = InputFile.FromFileId(content.FileId);
 
-        Telegram.Bot.Types.Message ret = await client.SendVideoAsync(
+        Telegram.Bot.Types.Message ret = await client.SendVideo(
             chatId.Id,
             file,
-            replyToMessageId: replyTo?.Id,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             caption: content.Caption,
             disableNotification: sendInfo.HideNotification,
@@ -263,12 +288,12 @@ internal static class ContentExtensions
         else
             file = InputFile.FromFileId(content.FileId);
 
-        Telegram.Bot.Types.Message ret = await client.SendVideoNoteAsync(
+        Telegram.Bot.Types.Message ret = await client.SendVideoNote(
             chatId.Id,
             file,
-            replyToMessageId: replyTo?.Id,
-            replyMarkup: markup,
-            duration: (int?) (content.Duration?.TotalSeconds ?? null),
+            replyTo?.Id,
+            markup,
+            (int?) (content.Duration?.TotalSeconds ?? null),
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected()
         );
@@ -283,12 +308,12 @@ internal static class ContentExtensions
         IReplyMarkup? markup,
         MessageId? replyTo)
     {
-        Telegram.Bot.Types.Message ret = await client.SendVoiceAsync(
+        Telegram.Bot.Types.Message ret = await client.SendVoice(
             chatId.Id,
             content.Data == null
                 ? InputFile.FromFileId(content.FileId)
                 : InputFile.FromStream(content.Data, content.FileName),
-            replyToMessageId: replyTo?.Id,
+            replyParameters: replyTo?.Id,
             replyMarkup: markup,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -299,8 +324,8 @@ internal static class ContentExtensions
 
     public static string GetMessageText(this string text)
     {
-        return text.Length > MAX_MESSAGE_TEXT_LENGTH ? text[..(MAX_MESSAGE_TEXT_LENGTH - 1)] : text;
+        return text.Length > MaxMessageTextLength ? text[..(MaxMessageTextLength - 1)] : text;
     }
 
-    private const int MAX_MESSAGE_TEXT_LENGTH = 4095;
+    private const int MaxMessageTextLength = 4095;
 }

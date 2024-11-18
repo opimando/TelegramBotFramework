@@ -25,7 +25,7 @@ public class FileProvider : IFileProvider
     public async Task<MemoryStream> DownloadFile(string fileId)
     {
         MemoryStream stream = new();
-        await _client.GetInfoAndDownloadFileAsync(fileId, stream);
+        await _client.GetInfoAndDownloadFile(fileId, stream);
 
         stream.Seek(0, SeekOrigin.Begin);
         return stream;

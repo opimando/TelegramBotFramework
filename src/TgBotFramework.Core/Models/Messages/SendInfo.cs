@@ -29,6 +29,11 @@ public class SendInfo
         return new SendInfo(new TextContent(text));
     }
 
+    public static implicit operator SendInfo(ChatAction action)
+    {
+        return new SendInfo(new ChatActionContent(action));
+    }
+
     public override string ToString()
     {
         return Content.ToString()!;

@@ -6,6 +6,8 @@ public class WaitNameState : BaseSelfDeleteMessagesState
 {
     protected override async Task<IStateInfo> InternalProcessMessage(Message receivedMessage)
     {
+        if (IsFirstStateInvoke) return new StateInfo(this);
+        
         Data.MessagesIds.Add(receivedMessage.Id);
 
         if (receivedMessage.Content is not TextContent text)
@@ -24,6 +26,6 @@ public class WaitNameState : BaseSelfDeleteMessagesState
         }
 
         await Messenger.Send(receivedMessage.ChatId, $"Твоё имя сохранено, {text.Content}!");
-        return new StateInfo(this);
+        return new StateInfo(null);
     }
 }

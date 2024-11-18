@@ -35,6 +35,7 @@ public class ChooseSexHandler : BaseChatState
             return new StateInfo(this);
         }
 
+        await content.Answer();
         string choosed = content.Data == "male" ? "мужской" :
             content.Data == "female" ? "женский" : "это что за пол такой?";
         await Messenger.Send(receivedMessage.ChatId, $"Ты выбрал {choosed}");

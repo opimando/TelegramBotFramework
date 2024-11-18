@@ -28,7 +28,7 @@ internal static class ButtonsExtensions
             InlineType.Switch => InlineKeyboardButton.WithSwitchInlineQuery(inline.Title, inline.Data),
             InlineType.SwitchCurrentChat => InlineKeyboardButton.WithSwitchInlineQueryCurrentChat(inline.Title,
                 inline.Data),
-            InlineType.Pay => InlineKeyboardButton.WithPayment(inline.Title),
+            InlineType.Pay => InlineKeyboardButton.WithPay(inline.Title),
             InlineType.WebApp =>
                 //TODO: addWebApp
                 InlineKeyboardButton.WithCallbackData(inline.Title),
