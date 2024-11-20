@@ -90,7 +90,7 @@ public class TelegramBot : ITelegramBot
                             : _exceptionPolicy.ExceptionHandler(ex);
                         
                         if (!string.IsNullOrWhiteSpace(message))
-                            await client.SendTextMessageAsync(new Telegram.Bot.Types.ChatId(update.Message.Chat.Id), message,
+                            await client.SendMessage(new Telegram.Bot.Types.ChatId(update.Message.Chat.Id), message,
                                 cancellationToken: cancel);
                     }
                     catch (Exception ex2)
@@ -112,20 +112,20 @@ public class TelegramBot : ITelegramBot
             .Where(s => s != null)
             .Select(s => s!).ToArray();
 
-        await _client.SetMyCommandsAsync(tgCommands);
+        await _client.SetMyCommands(tgCommands);
         _eventBus.Publish(new SetBotCommandsEvent(buttonsList));
     }
 
     public async Task SetDescription(string description)
     {
-        await _client.SetMyDescriptionAsync(description);
+        await _client.SetMyDescription(description);
         _eventBus.Publish(new SetBotDescriptionEvent(description));
     }
 
     private async Task NotifyAboutAccessDenies(Message message)
     {
         string textToMessage = _authProvider == null ? "Нет доступа" : await _authProvider.GetAccessDeniedMessage();
-        await _client.SendTextMessageAsync(message.ChatId.Id, textToMessage);
+        await _client.SendMessage(message.ChatId.Id, textToMessage);
         _eventBus.Publish(new UserHasNotAccessEvent(message.From));
     }
 }

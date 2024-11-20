@@ -9,6 +9,7 @@
 
 #endregion Copyright
 
+using System.Diagnostics;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -37,20 +38,32 @@ public class Messenger : IMessenger
 
         IReplyMarkup? markup = GetMarkup(sendMessageInfo);
 
-        MessageId messageId = sendMessageInfo.Content switch
-        {
-            ChatActionContent action => await action.Send(Client, chatId),
-            TextContent text => await text.Send(Client, chatId, sendMessageInfo, markup, replyTo),
-            ImageGroupContent group => await group.Send(Client, chatId, sendMessageInfo, replyTo),
-            LocationContent location => await location.Send(Client, chatId, sendMessageInfo, markup, replyTo),
-            ContactContent contact => await contact.Send(Client, chatId, sendMessageInfo, markup, replyTo),
-            BaseFileContent file => await file.Send(Client, chatId, sendMessageInfo, markup, replyTo),
-            _ => throw new ArgumentOutOfRangeException("Content",
-                $"Отправка типа сообщения {sendMessageInfo.Content.GetType().Name} не поддерживается")
-        };
+        var sw = Stopwatch.StartNew();
 
-        _eventBus.Publish(new MessageSendEvent(chatId, sendMessageInfo));
-        return messageId;
+        try
+        {
+            MessageId messageId = sendMessageInfo.Content switch
+            {
+                ChatActionContent action => await action.Send(Client, chatId),
+                TextContent text => await text.Send(Client, chatId, sendMessageInfo, markup, replyTo),
+                ImageGroupContent group => await group.Send(Client, chatId, sendMessageInfo, replyTo),
+                LocationContent location => await location.Send(Client, chatId, sendMessageInfo, markup, replyTo),
+                ContactContent contact => await contact.Send(Client, chatId, sendMessageInfo, markup, replyTo),
+                BaseFileContent file => await file.Send(Client, chatId, sendMessageInfo, markup, replyTo),
+                _ => throw new ArgumentOutOfRangeException("Content",
+                    $"Отправка типа сообщения {sendMessageInfo.Content.GetType().Name} не поддерживается")
+            };
+
+            sw.Stop();
+
+            _eventBus.Publish(new MessageSendEvent(chatId, sendMessageInfo, sw.Elapsed));
+            return messageId;
+        }
+        catch
+        {
+            sw.Stop();
+            throw;
+        }
     }
 
     public Task<MessageId> Send(ChatId chatId, SendInfo sendMessageInfo)
@@ -79,17 +92,27 @@ public class Messenger : IMessenger
                 throw new InvalidCastException("Невозможно обновить не InlineKeyboard сообщение");
         }
 
-        switch (updatedSendMessageInfo.Content)
+        var sw = Stopwatch.StartNew();
+        try
         {
-            case TextContent text:
-                await InternalEditMessage(text, messageToEditId, chatId, updatedSendMessageInfo, inlineMarkup);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException("Content",
-                    $"Тип сообщения {updatedSendMessageInfo.Content.GetType().Name} не поддерживается");
-        }
+            switch (updatedSendMessageInfo.Content)
+            {
+                case TextContent text:
+                    await InternalEditMessage(text, messageToEditId, chatId, updatedSendMessageInfo, inlineMarkup);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Content",
+                        $"Тип сообщения {updatedSendMessageInfo.Content.GetType().Name} не поддерживается");
+            }
 
-        _eventBus.Publish(new MessageUpdatedEvent(chatId, updatedSendMessageInfo, messageToEditId));
+            sw.Stop();
+            _eventBus.Publish(new MessageUpdatedEvent(chatId, updatedSendMessageInfo, messageToEditId, sw.Elapsed));
+        }
+        catch
+        {
+            sw.Stop();
+            throw;
+        }
     }
 
     private async Task InternalEditMessage(
@@ -141,6 +164,7 @@ public class Messenger : IMessenger
     {
         if (_spamFilter == null) return Task.CompletedTask;
 
+        _eventBus.Publish(new WaitSpamFilterEvent());
         return _spamFilter.WaitIfLimitHit();
     }
 }

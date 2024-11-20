@@ -15,8 +15,8 @@ public class MessageUpdatedEvent : MessageSendEvent
 {
     public MessageId OldMessageId { get; }
 
-    public MessageUpdatedEvent(ChatId destination, SendInfo message, MessageId oldMessageId) : base(destination,
-        message)
+    public MessageUpdatedEvent(ChatId destination, SendInfo message, MessageId oldMessageId, TimeSpan duration)
+        : base(destination, message, duration)
     {
         OldMessageId = oldMessageId;
     }

@@ -322,7 +322,7 @@ internal static class ContentExtensions
         return ret.MessageId;
     }
 
-    public static string GetMessageText(this string text)
+    internal static string GetMessageText(this string text)
     {
         return text.Length > MaxMessageTextLength ? text[..(MaxMessageTextLength - 1)] : text;
     }
