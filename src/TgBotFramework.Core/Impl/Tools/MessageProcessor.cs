@@ -62,6 +62,7 @@ public class MessageProcessor : IMessageProcessor
 
         IStateInfo next = await ExecuteWithMiddlewares(message, stateInfo.NextState, stateInfo.NextState);
         await _stateStore.SaveState(message.ChatId, next.NextState);
+        await InvokeAgainIfStateInfo(next, message);
     }
 
     private async Task<IStateInfo> ProcessInternal(Message message, IChatState executingState, IChatState? oldState)
