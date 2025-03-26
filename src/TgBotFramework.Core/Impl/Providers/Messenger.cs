@@ -36,7 +36,7 @@ public class Messenger : IMessenger
 
         await WaitSpamFilterIfExist();
 
-        IReplyMarkup? markup = GetMarkup(sendMessageInfo);
+        ReplyMarkup? markup = GetMarkup(sendMessageInfo);
 
         var sw = Stopwatch.StartNew();
 
@@ -81,7 +81,7 @@ public class Messenger : IMessenger
         ThrowIfMessageIsEmpty(updatedSendMessageInfo.Content);
         await WaitSpamFilterIfExist();
 
-        IReplyMarkup? markup = GetMarkup(updatedSendMessageInfo);
+        ReplyMarkup? markup = GetMarkup(updatedSendMessageInfo);
         InlineKeyboardMarkup? inlineMarkup = null;
 
         if (markup != null)
@@ -151,7 +151,7 @@ public class Messenger : IMessenger
             throw new ArgumentException("Сообщение не может быть пустым", nameof(messageContent));
     }
 
-    private IReplyMarkup? GetMarkup(SendInfo message)
+    private ReplyMarkup? GetMarkup(SendInfo message)
     {
         if (message.Buttons == null) return null;
         if (message.Buttons is not BaseMessageButtonGroup group)

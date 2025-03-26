@@ -16,7 +16,7 @@ namespace TgBotFramework.Core;
 
 internal static class MessageButtonGroupExtensions
 {
-    public static IReplyMarkup? ToMarkup(this IButtonStructure buttons)
+    public static ReplyMarkup? ToMarkup(this IButtonStructure buttons)
     {
         if (buttons is not BaseMessageButtonGroup buttonStructure) throw new NotImplementedException();
 
@@ -28,7 +28,7 @@ internal static class MessageButtonGroupExtensions
         };
     }
 
-    private static IReplyMarkup GetInlineMarkup(InlineButtonGroup buttons)
+    private static ReplyMarkup GetInlineMarkup(InlineButtonGroup buttons)
     {
         List<List<Button>> buttonsByLevels = buttons.Buttons;
 
@@ -39,7 +39,7 @@ internal static class MessageButtonGroupExtensions
         return new InlineKeyboardMarkup(retByLvls);
     }
 
-    private static IReplyMarkup GetReplyMarkup(KeyboardButtonGroup buttons)
+    private static ReplyMarkup GetReplyMarkup(KeyboardButtonGroup buttons)
     {
         List<List<Button>> buttonsByLevels = buttons.Buttons;
 
