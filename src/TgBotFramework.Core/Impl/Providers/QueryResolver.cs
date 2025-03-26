@@ -30,7 +30,7 @@ public class QueryResolver : IQueryResolver
         try
         {
             List<InlineQueryResult> queryResults = GetQueryResults(results).ToList();
-            await _client.AnswerInlineQueryAsync(queryId, queryResults, isPersonal: isPersonal);
+            await _client.AnswerInlineQuery(queryId, queryResults, isPersonal: isPersonal);
         }
         catch (Exception ex)
         {
@@ -40,12 +40,34 @@ public class QueryResolver : IQueryResolver
 
     private IEnumerable<InlineQueryResult> GetQueryResults(IEnumerable<QueryMessageResponse> results)
     {
-        return results.Select(result => result switch
+        return results.Select(GetQueryResult);
+    }
+
+    private InlineQueryResult GetQueryResult(QueryMessageResponse response)
+    {
+        return response switch
         {
+            ImageListItemQueryMessageResponse img => new InlineQueryResultArticle(img.Id, img.Title,
+                new InputTextMessageContent(img.Title) {ParseMode = img.ParseMode.GetParseMode()}
+            )
+            {
+                ThumbnailUrl = img.Thumbnail,
+                Description = img.Description,
+                Url = img.Url
+            },
             TextQueryMessageResponse text => new InlineQueryResultArticle(text.Id, text.Title,
                 new InputTextMessageContent(text.Text) {ParseMode = text.ParseMode.GetParseMode()}),
-            _ => throw new ArgumentOutOfRangeException(nameof(result), result,
+            ImageQueryMessageResponse image => new InlineQueryResultPhoto(image.Id, image.PhotoUrl, image.ThumbnailUrl)
+            {
+                Title = image.Title,
+                ParseMode = image.ParseMode.GetParseMode(),
+                Caption = image.ImageCaptionInMessage,
+                Description = image.ResultDescription,
+                PhotoWidth = image.Width,
+                PhotoHeight = image.Height
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(response), response,
                 "Не удалось распознать ответ на Inline Query")
-        });
+        };
     }
 }

@@ -23,7 +23,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         return content switch
@@ -43,7 +43,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         Telegram.Bot.Types.Message ret = await client.SendAudio(
@@ -66,7 +66,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         Telegram.Bot.Types.Message ret = await client.SendDocument(
@@ -89,7 +89,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         InputFile data;
@@ -121,7 +121,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         Telegram.Bot.Types.Message ret = await client.SendContact(
@@ -168,7 +168,7 @@ internal static class ContentExtensions
             photos.Add(photo);
         }
 
-        var ret = await client.SendMediaGroup(chatId.Id,
+        Telegram.Bot.Types.Message[] ret = await client.SendMediaGroup(chatId.Id,
             photos,
             disableNotification: sendInfo.HideNotification,
             protectContent: sendInfo.Protected.IsContentProtected(),
@@ -182,7 +182,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         int? livePeriod = null;
@@ -230,7 +230,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo
     )
     {
@@ -252,7 +252,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         InputFile file;
@@ -279,7 +279,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         InputFile file;
@@ -305,7 +305,7 @@ internal static class ContentExtensions
         ITelegramBotClient client,
         ChatId chatId,
         SendInfo sendInfo,
-        IReplyMarkup? markup,
+        ReplyMarkup? markup,
         MessageId? replyTo)
     {
         Telegram.Bot.Types.Message ret = await client.SendVoice(
