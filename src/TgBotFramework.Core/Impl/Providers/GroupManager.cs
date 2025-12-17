@@ -30,7 +30,7 @@ public class GroupManager : IGroupManager
     {
         try
         {
-            ChatMember requestUser = await _client.GetChatMemberAsync(chatId.Id, userId);
+            ChatMember requestUser = await _client.GetChatMember(chatId.Id, userId);
 
             return requestUser.Status is ChatMemberStatus.Administrator or ChatMemberStatus.Creator
                 or ChatMemberStatus.Member;
@@ -44,7 +44,7 @@ public class GroupManager : IGroupManager
 
     public async Task KickUserFromGroup(ChatId chatId, UserId userId)
     {
-        await _client.BanChatSenderChatAsync(chatId.Id, userId);
-        await _client.UnbanChatSenderChatAsync(chatId.Id, userId);
+        await _client.BanChatSenderChat(chatId.Id, userId);
+        await _client.UnbanChatSenderChat(chatId.Id, userId);
     }
 }
